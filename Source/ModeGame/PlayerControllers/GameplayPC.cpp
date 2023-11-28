@@ -6,6 +6,7 @@
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/Character.h"
+#include "../Characters/BaseCharacter.h"
 
 void AGameplayPC::BeginPlay()
 {
@@ -15,6 +16,12 @@ void AGameplayPC::BeginPlay()
 	if (!IsValid(EnhancedInputSubsystem)) { return; }
 
 	EnhancedInputSubsystem->AddMappingContext(GameplayInputMappingContext, 0);
+
+	TObjectPtr<ABaseCharacter> BaseCharacter = GetPawn<ABaseCharacter>();
+	if (IsValid(BaseCharacter))
+	{
+		BaseCharacter->SetFirstPersonMode(true);
+	}
 }
 
 void AGameplayPC::SetupInputComponent()

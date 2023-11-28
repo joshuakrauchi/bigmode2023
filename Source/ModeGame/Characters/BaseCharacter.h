@@ -5,6 +5,8 @@
 #include "BaseCharacter.generated.h"
 
 class IFireable;
+class UCameraComponent;
+class USkeletalMeshComponent;
 
 UENUM()
 enum class ECharacterType : uint8
@@ -24,7 +26,17 @@ class MODEGAME_API ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditAnywhere)
+		bool bIsFirstPersonMode = false;
+
 private:
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<UCameraComponent> FirstPersonCamera = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<USkeletalMeshComponent> FirstPersonMesh = nullptr;
+
 	UPROPERTY()
 		TObjectPtr<AActor> FireableActor = nullptr;
 
@@ -39,6 +51,12 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	TObjectPtr<USkeletalMeshComponent> GetFirstPersonMesh();
+
+	bool IsFirstPersonMode() const;
+
+	void SetFirstPersonMode(bool bFirstPersonMode);
 
 	IFireable* GetFireable();
 
