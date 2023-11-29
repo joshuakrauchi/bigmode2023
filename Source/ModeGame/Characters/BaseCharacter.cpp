@@ -1,5 +1,5 @@
 #include "BaseCharacter.h"
-#include "../Interfaces/Fireable.h"
+#include "Interfaces/Fireable.h"
 #include "Camera/CameraComponent.h"
 
 ABaseCharacter::ABaseCharacter()

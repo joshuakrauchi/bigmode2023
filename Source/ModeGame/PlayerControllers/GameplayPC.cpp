@@ -6,8 +6,8 @@
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/Character.h"
-#include "../Characters/BaseCharacter.h"
-#include "../Interfaces/Fireable.h"
+#include "Characters/BaseCharacter.h"
+#include "Interfaces/Fireable.h"
 
 void AGameplayPC::BeginPlay()
 {
