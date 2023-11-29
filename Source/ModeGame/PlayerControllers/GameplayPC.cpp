@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/Character.h"
 #include "../Characters/BaseCharacter.h"
+#include "../Interfaces/Fireable.h"
 
 void AGameplayPC::BeginPlay()
 {
@@ -33,13 +34,13 @@ void AGameplayPC::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnLookTriggered);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnMoveTriggered);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnFireTriggered);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AGameplayPC::OnFireTriggered);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AGameplayPC::OnFireCompleted);
-	EnhancedInputComponent->BindAction(GrappleAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnGrappleTriggered);
+	EnhancedInputComponent->BindAction(GrappleAction, ETriggerEvent::Started, this, &AGameplayPC::OnGrappleTriggered);
 	EnhancedInputComponent->BindAction(GrappleAction, ETriggerEvent::Completed, this, &AGameplayPC::OnGrappleCompleted);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnJumpTriggered);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AGameplayPC::OnJumpTriggered);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGameplayPC::OnJumpCompleted);
-	EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnMeleeTriggered);
+	EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AGameplayPC::OnMeleeTriggered);
 }
 
 void AGameplayPC::OnLookTriggered(const FInputActionValue& Value)
@@ -63,12 +64,24 @@ void AGameplayPC::OnMoveTriggered(const FInputActionValue& Value)
 
 void AGameplayPC::OnFireTriggered(const FInputActionValue& Value)
 {
-	
+	TObjectPtr<ABaseCharacter> BaseCharacter = GetPawn<ABaseCharacter>();
+	if (!IsValid(BaseCharacter)) { return; }
+
+	IFireable* Fireable = BaseCharacter->GetFireable();
+	if (Fireable == nullptr) { return; }
+
+	Fireable->TryBeginFire();
 }
 
 void AGameplayPC::OnFireCompleted(const FInputActionValue& Value)
 {
+	TObjectPtr<ABaseCharacter> BaseCharacter = GetPawn<ABaseCharacter>();
+	if (!IsValid(BaseCharacter)) { return; }
 
+	IFireable* Fireable = BaseCharacter->GetFireable();
+	if (Fireable == nullptr) { return; }
+
+	Fireable->TryEndFire();
 }
 
 void AGameplayPC::OnGrappleTriggered(const FInputActionValue& Value)

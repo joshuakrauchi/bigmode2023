@@ -45,7 +45,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 }
 
-TObjectPtr<USkeletalMeshComponent> ABaseCharacter::GetFirstPersonMesh()
+USkeletalMeshComponent* ABaseCharacter::GetFirstPersonMesh()
 {
 	return FirstPersonMesh;
 }
@@ -63,4 +63,9 @@ void ABaseCharacter::SetFirstPersonMode(bool bFirstPersonMode)
 IFireable* ABaseCharacter::GetFireable()
 {
 	return Cast<IFireable>(FireableActor);
+}
+
+void ABaseCharacter::SetFireableActor(AActor* Actor)
+{
+	FireableActor = Actor;
 }
