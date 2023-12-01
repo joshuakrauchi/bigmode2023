@@ -52,19 +52,22 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		USkeletalMeshComponent* GetFirstPersonMesh();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		bool IsFirstPersonMode() const;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void SetFirstPersonMode(bool bFirstPersonMode);
 
 	IFireable* GetFireable();
 
 	UFUNCTION(BlueprintCallable)
 		void SetFireableActor(AActor* Actor);
+
+	UFUNCTION(BlueprintCallable)
+		UCameraComponent* GetFirstPersonCamera();
 
 protected:
 

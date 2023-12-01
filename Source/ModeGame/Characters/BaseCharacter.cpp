@@ -71,3 +71,8 @@ void ABaseCharacter::SetFireableActor(AActor* Actor)
 {
 	FireableActor = Actor;
 }
+
+UCameraComponent* ABaseCharacter::GetFirstPersonCamera()
+{
+	return FirstPersonCamera;
+}
