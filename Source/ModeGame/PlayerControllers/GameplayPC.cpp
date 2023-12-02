@@ -8,6 +8,12 @@
 #include "GameFramework/Character.h"
 #include "Characters/BaseCharacter.h"
 #include "Interfaces/Fireable.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
+FVector2D AGameplayPC::GetMoveInput() const
+{
+	return MoveInput;
+}
 
 void AGameplayPC::BeginPlay()
 {
@@ -34,6 +40,7 @@ void AGameplayPC::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnLookTriggered);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnMoveTriggered);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AGameplayPC::OnMoveTriggered);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AGameplayPC::OnFireTriggered);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AGameplayPC::OnFireCompleted);
 	EnhancedInputComponent->BindAction(GrappleAction, ETriggerEvent::Started, this, &AGameplayPC::OnGrappleTriggered);
@@ -55,11 +62,20 @@ void AGameplayPC::OnMoveTriggered(const FInputActionValue& Value)
 {
 	FVector2D MoveVector = Value.Get<FVector2D>();
 
+	MoveInput = MoveVector;
+
 	TObjectPtr<APawn> PossessedPawn = GetPawn();
 	if (!IsValid(PossessedPawn)) { return; }
 
 	PossessedPawn->AddMovementInput(PossessedPawn->GetActorRightVector(), MoveVector.X);
 	PossessedPawn->AddMovementInput(PossessedPawn->GetActorForwardVector(), MoveVector.Y);
+}
+
+void AGameplayPC::OnMoveCompleted(const FInputActionValue& Value)
+{
+	FVector2D MoveVector = Value.Get<FVector2D>();
+
+	MoveInput = MoveVector;
 }
 
 void AGameplayPC::OnFireTriggered(const FInputActionValue& Value)
@@ -99,7 +115,16 @@ void AGameplayPC::OnJumpTriggered(const FInputActionValue& Value)
 	TObjectPtr<ACharacter> PossessedCharacter = GetCharacter();
 	if (!IsValid(PossessedCharacter)) { return; }
 
-	PossessedCharacter->Jump();
+	if (PossessedCharacter->CanJump())
+	{
+		PossessedCharacter->Jump();
+		bCanJumpAgain = true;
+	}
+	else if (bCanJumpAgain)
+	{
+		DoubleJump();
+		bCanJumpAgain = false;
+	}
 }
 
 void AGameplayPC::OnJumpCompleted(const FInputActionValue& Value)
@@ -113,5 +138,25 @@ void AGameplayPC::OnJumpCompleted(const FInputActionValue& Value)
 void AGameplayPC::OnMeleeTriggered(const FInputActionValue& Value)
 {
 
+}
+
+void AGameplayPC::DoubleJump()
+{
+	FVector ImpulseVector{ -GetMoveInput().X, GetMoveInput().Y, 0.0f };
+	ImpulseVector *= DoubleJumpImpulseStrength;
+
+	FRotator Rotation = GetControlRotation();
+	Rotation.Yaw += -90.0f;
+
+	ImpulseVector = Rotation.RotateVector(ImpulseVector);
+	ImpulseVector.Z = DoubleJumpHeight;
+
+	TObjectPtr<ACharacter> PossessedCharacter = GetCharacter();
+	if (!IsValid(PossessedCharacter)) { return; }
+
+	TObjectPtr<UCharacterMovementComponent> CharacterMovement = PossessedCharacter->GetCharacterMovement();
+	if (!IsValid(CharacterMovement)) { return; }
+
+	CharacterMovement->Velocity = ImpulseVector;
 }
 

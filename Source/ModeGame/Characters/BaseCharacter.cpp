@@ -1,6 +1,7 @@
 #include "BaseCharacter.h"
 #include "Interfaces/Fireable.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -19,8 +20,14 @@ ABaseCharacter::ABaseCharacter()
 	{
 		ThirdPersonMesh->SetCastHiddenShadow(true);
 	}
-
+	
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	TObjectPtr<UCharacterMovementComponent> Movement = GetCharacterMovement();
+	Movement->MaxWalkSpeed = 900.0f;
+	Movement->JumpZVelocity = 600.0f;
+	Movement->AirControl = 1.0f;
+	Movement->AirControlBoostMultiplier = 100.0f;
 }
 
 // Called when the game starts or when spawned
