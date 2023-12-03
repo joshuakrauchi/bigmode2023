@@ -112,18 +112,17 @@ void AGameplayPC::OnGrappleCompleted(const FInputActionValue& Value)
 
 void AGameplayPC::OnJumpTriggered(const FInputActionValue& Value)
 {
-	TObjectPtr<ACharacter> PossessedCharacter = GetCharacter();
+	TObjectPtr<ABaseCharacter> PossessedCharacter = GetPawn<ABaseCharacter>();
 	if (!IsValid(PossessedCharacter)) { return; }
 
 	if (PossessedCharacter->CanJump())
 	{
 		PossessedCharacter->Jump();
-		bCanJumpAgain = true;
+		PossessedCharacter->ResetDoubleJump();
 	}
-	else if (bCanJumpAgain)
+	else if (PossessedCharacter->CanDoubleJump())
 	{
-		DoubleJump();
-		bCanJumpAgain = false;
+		PossessedCharacter->DoubleJump();
 	}
 }
 
@@ -139,24 +138,3 @@ void AGameplayPC::OnMeleeTriggered(const FInputActionValue& Value)
 {
 
 }
-
-void AGameplayPC::DoubleJump()
-{
-	FVector ImpulseVector{ -GetMoveInput().X, GetMoveInput().Y, 0.0f };
-	ImpulseVector *= DoubleJumpImpulseStrength;
-
-	FRotator Rotation = GetControlRotation();
-	Rotation.Yaw += -90.0f;
-
-	ImpulseVector = Rotation.RotateVector(ImpulseVector);
-	ImpulseVector.Z = DoubleJumpHeight;
-
-	TObjectPtr<ACharacter> PossessedCharacter = GetCharacter();
-	if (!IsValid(PossessedCharacter)) { return; }
-
-	TObjectPtr<UCharacterMovementComponent> CharacterMovement = PossessedCharacter->GetCharacterMovement();
-	if (!IsValid(CharacterMovement)) { return; }
-
-	CharacterMovement->Velocity = ImpulseVector;
-}
-

@@ -44,15 +44,6 @@ private:
 	UPROPERTY()
 		FVector2D MoveInput = FVector2D::Zero();
 
-	UPROPERTY()
-		bool bCanJumpAgain = false;
-
-	UPROPERTY(EditAnywhere)
-		float DoubleJumpImpulseStrength = 0.0f;
-
-	UPROPERTY(EditAnywhere)
-		float DoubleJumpHeight = 0.0f;
-
 public:
 	UFUNCTION(BlueprintCallable)
 		FVector2D GetMoveInput() const;
@@ -92,8 +83,5 @@ private:
 
 	UFUNCTION()
 		void OnMeleeTriggered(const FInputActionValue& Value);
-
-	UFUNCTION()
-		void DoubleJump();
 
 };
