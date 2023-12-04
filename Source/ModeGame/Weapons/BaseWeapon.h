@@ -13,15 +13,20 @@ class MODEGAME_API ABaseWeapon : public AActor, public IFireable
 	GENERATED_BODY()
 
 protected:
-	const FTransform* EquippedTransform;
-	const float MaxRange = 0.0f;
+	const FTransform* EquippedTransform = nullptr;
+
+	UPROPERTY(EditAnywhere)
+		float MaxRange = 0.0f;
 	
-public:	
+public:
 	// Sets default values for this actor's properties
 	ABaseWeapon();
 
 protected:
-	ABaseWeapon(float MaxRange) : MaxRange(MaxRange) {};
+	ABaseWeapon(float MaxRange) 
+		: MaxRange(MaxRange),
+		  EquippedTransform(nullptr) 
+	{};
 
 protected:
 	// Called when the game starts or when spawned
