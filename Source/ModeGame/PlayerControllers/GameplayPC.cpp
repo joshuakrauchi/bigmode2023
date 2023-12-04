@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Characters/BaseCharacter.h"
 #include "Interfaces/Fireable.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 FVector2D AGameplayPC::GetMoveInput() const

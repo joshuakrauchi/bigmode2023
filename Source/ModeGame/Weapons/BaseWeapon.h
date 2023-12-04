@@ -11,10 +11,17 @@ UCLASS()
 class MODEGAME_API ABaseWeapon : public AActor, public IFireable
 {
 	GENERATED_BODY()
+
+protected:
+	const FTransform* EquippedTransform;
+	const float MaxRange = 0.0f;
 	
 public:	
 	// Sets default values for this actor's properties
 	ABaseWeapon();
+
+protected:
+	ABaseWeapon(float MaxRange) : MaxRange(MaxRange) {};
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,4 +35,9 @@ public:
 
 	virtual bool TryEndFire() override;
 
+	virtual bool TryEquipToParentTransform(const FTransform& Transform) override;
+
+public:
+	UFUNCTION(BlueprintCallable)
+		const FTransform& GetEquippedTransform() { return *EquippedTransform; }
 };
