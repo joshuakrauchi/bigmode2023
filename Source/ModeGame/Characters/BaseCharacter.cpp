@@ -61,6 +61,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UpdateResetDoubleJump();
 }
 
 USkeletalMeshComponent* ABaseCharacter::GetFirstPersonMesh()
@@ -123,4 +124,15 @@ void ABaseCharacter::DoubleJump()
 	Movement->Velocity = ImpulseVector;
 
 	bCanJumpAgain = false;
+}
+
+void ABaseCharacter::UpdateResetDoubleJump()
+{
+	TObjectPtr<UCharacterMovementComponent> Movement = GetCharacterMovement();
+	if (!IsValid(Movement)) { return; }
+
+	if (!Movement->IsFalling())
+	{
+		ResetDoubleJump();
+	}
 }

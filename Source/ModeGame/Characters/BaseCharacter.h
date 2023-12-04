@@ -87,6 +87,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DoubleJump();
 
+private:
+	UFUNCTION()
+		void UpdateResetDoubleJump();
+
 protected:
 
 };
