@@ -64,9 +64,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		USkeletalMeshComponent* GetFirstPersonMesh();
 
-	UFUNCTION()
-		UCameraComponent* GetFirstPersonCamera();
-
 	UFUNCTION(BlueprintCallable)
 		bool IsFirstPersonMode() const;
 

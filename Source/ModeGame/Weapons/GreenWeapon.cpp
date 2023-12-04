@@ -3,7 +3,7 @@
 
 #include "GreenWeapon.h"
 
-AGreenWeapon::AGreenWeapon()
+AGreenWeapon::AGreenWeapon() : ABaseWeapon(10000.0f)
 {
 }
 
@@ -19,7 +19,21 @@ void AGreenWeapon::Tick(float DeltaTime)
 
 bool AGreenWeapon::TryBeginFire()
 {
-	ReceiveTestFire();
+	FVector ParentLocation = EquippedTransform->GetLocation();
+	FVector ParentForward = EquippedTransform->GetRotation().GetForwardVector();
+
+	UWorld* World = GetWorld();
+
+	if (IsValid(World)) 
+	{
+		FHitResult Trace;
+		World->LineTraceSingleByChannel(Trace, ParentLocation, ParentLocation + (ParentForward * MaxRange), ECollisionChannel::ECC_Visibility);
+		DrawDebugLine(World, ParentLocation, ParentLocation + (ParentForward * MaxRange), { 255, 0, 0 }, false, 3.0f, 0U, 1.0f);
+	}
+
+	// Do trace stuff
+	// ReceiveTestFire();
+
 	return Super::TryBeginFire() && false;
 }
 

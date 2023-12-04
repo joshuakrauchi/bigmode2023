@@ -47,6 +47,13 @@ void ABaseCharacter::BeginPlay()
 	{
 		ThirdPersonMesh->SetHiddenInGame(bIsFirstPersonMode);
 	}
+
+	IFireable* Weapon = GetFireable();
+	UCameraComponent* Camera = GetFirstPersonCamera();
+	if (Weapon != nullptr && IsValid(Camera))
+	{
+		Weapon->TryEquipToParentTransform(Camera->GetComponentTransform());
+	}
 }
 
 // Called every frame
@@ -59,11 +66,6 @@ void ABaseCharacter::Tick(float DeltaTime)
 USkeletalMeshComponent* ABaseCharacter::GetFirstPersonMesh()
 {
 	return FirstPersonMesh;
-}
-
-UCameraComponent* ABaseCharacter::GetFirstPersonCamera()
-{
-	return FirstPersonCamera;
 }
 
 bool ABaseCharacter::IsFirstPersonMode() const
