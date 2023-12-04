@@ -40,6 +40,15 @@ private:
 	UPROPERTY()
 		TObjectPtr<AActor> FireableActor = nullptr;
 
+	UPROPERTY()
+		bool bCanJumpAgain = false;
+
+	UPROPERTY(EditAnywhere)
+		float DoubleJumpImpulseStrength = 1100.0f;
+
+	UPROPERTY(EditAnywhere)
+		float DoubleJumpHeight = 600.0f;
+
 public:
 	// Sets default values for this character's properties
 	ABaseCharacter();
@@ -52,22 +61,34 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		USkeletalMeshComponent* GetFirstPersonMesh();
 
 	UFUNCTION()
 		UCameraComponent* GetFirstPersonCamera();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		bool IsFirstPersonMode() const;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void SetFirstPersonMode(bool bFirstPersonMode);
 
 	IFireable* GetFireable();
 
 	UFUNCTION(BlueprintCallable)
 		void SetFireableActor(AActor* Actor);
+
+	UFUNCTION(BlueprintCallable)
+		UCameraComponent* GetFirstPersonCamera();
+
+	UFUNCTION(BlueprintCallable)
+		void ResetDoubleJump();
+
+	UFUNCTION(BlueprintCallable)
+		bool CanDoubleJump() const;
+
+	UFUNCTION(BlueprintCallable)
+		void DoubleJump();
 
 protected:
 

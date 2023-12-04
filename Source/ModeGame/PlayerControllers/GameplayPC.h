@@ -19,7 +19,7 @@ class MODEGAME_API AGameplayPC : public APlayerController
 {
 	GENERATED_BODY()
 
-public:
+private:
 	UPROPERTY(EditAnywhere)
 		TObjectPtr<UInputMappingContext> GameplayInputMappingContext = nullptr;
 
@@ -41,6 +41,13 @@ public:
 	UPROPERTY(EditAnywhere)
 		TObjectPtr<UInputAction> MeleeAction = nullptr;
 
+	UPROPERTY()
+		FVector2D MoveInput = FVector2D::Zero();
+
+public:
+	UFUNCTION(BlueprintCallable)
+		FVector2D GetMoveInput() const;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -52,6 +59,9 @@ private:
 
 	UFUNCTION()
 		void OnMoveTriggered(const FInputActionValue& Value);
+
+	UFUNCTION()
+		void OnMoveCompleted(const FInputActionValue& Value);
 
 	UFUNCTION()
 		void OnFireTriggered(const FInputActionValue& Value);
