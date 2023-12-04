@@ -50,6 +50,11 @@ USkeletalMeshComponent* ABaseCharacter::GetFirstPersonMesh()
 	return FirstPersonMesh;
 }
 
+UCameraComponent* ABaseCharacter::GetFirstPersonCamera()
+{
+	return FirstPersonCamera;
+}
+
 bool ABaseCharacter::IsFirstPersonMode() const
 {
 	return bIsFirstPersonMode;

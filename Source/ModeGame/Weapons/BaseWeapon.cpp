@@ -39,3 +39,8 @@ bool ABaseWeapon::TryEndFire()
 	return true;
 }
 
+bool ABaseWeapon::TryEquipToParentTransform(const FTransform& Transform)
+{
+	return (EquippedTransform = &Transform) != nullptr;
+}
+

@@ -28,4 +28,6 @@ public:
 	UFUNCTION()
 		virtual bool TryEndFire() PURE_VIRTUAL(IFireable::TryEndFire, return false;);
 
+	UFUNCTION()
+		virtual bool TryEquipToParentTransform(const FTransform& Transform) PURE_VIRTUAL(IFireable::TryEquipToParentTransform, return false;);
 };

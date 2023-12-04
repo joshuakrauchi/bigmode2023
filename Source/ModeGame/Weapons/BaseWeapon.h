@@ -11,6 +11,9 @@ UCLASS()
 class MODEGAME_API ABaseWeapon : public AActor, public IFireable
 {
 	GENERATED_BODY()
+
+protected:
+	const FTransform* EquippedTransform;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -28,4 +31,9 @@ public:
 
 	virtual bool TryEndFire() override;
 
+	virtual bool TryEquipToParentTransform(const FTransform& Transform) override;
+
+public:
+	UFUNCTION(BlueprintCallable)
+		const FTransform& GetEquippedTransform() { return *EquippedTransform; }
 };

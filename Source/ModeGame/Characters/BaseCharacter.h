@@ -56,6 +56,9 @@ public:
 		USkeletalMeshComponent* GetFirstPersonMesh();
 
 	UFUNCTION()
+		UCameraComponent* GetFirstPersonCamera();
+
+	UFUNCTION()
 		bool IsFirstPersonMode() const;
 
 	UFUNCTION()
