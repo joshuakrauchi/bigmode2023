@@ -6,6 +6,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "GameplayGS.generated.h"
 
+class USpawnManagerComponent;
+
 /**
  * 
  */
@@ -14,4 +16,16 @@ class MODEGAME_API AGameplayGS : public AGameStateBase
 {
 	GENERATED_BODY()
 	
+private:
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<USpawnManagerComponent> SpawnManagerComponent = nullptr;
+
+public:
+	AGameplayGS();
+
+	virtual void BeginPlay();
+
+	UFUNCTION()
+		USpawnManagerComponent* GetSpawnManager();
+
 };
