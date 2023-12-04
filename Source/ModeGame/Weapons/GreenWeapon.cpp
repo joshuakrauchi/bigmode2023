@@ -2,6 +2,7 @@
 
 
 #include "GreenWeapon.h"
+#include "Math/UnrealMathUtility.h"
 
 AGreenWeapon::AGreenWeapon() : ABaseWeapon(10000.0f)
 {
@@ -27,19 +28,29 @@ bool AGreenWeapon::TryBeginFire()
 	if (IsValid(World)) 
 	{
 		FHitResult Trace;
-		World->LineTraceSingleByChannel(Trace, ParentLocation, ParentLocation + (ParentForward * MaxRange), ECollisionChannel::ECC_Visibility);
-		DrawDebugLine(World, ParentLocation, ParentLocation + (ParentForward * MaxRange), { 255, 0, 0 }, false, 3.0f, 0U, 1.0f);
+
+		// Finds hits
+		for (int i = 0; i < MaxPellets; ++i)
+		{
+			FVector RandomSpread { FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians), FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians), FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians) };
+			FVector AdjustedForward = (ParentForward + RandomSpread) * MaxRange;
+
+			World->LineTraceSingleByChannel(Trace, ParentLocation, ParentLocation + AdjustedForward, ECollisionChannel::ECC_Visibility);
+
+			// Visual debug component
+			DrawDebugLine(World, ParentLocation, ParentLocation + AdjustedForward, { 255, 0, 0 }, false, 3.0f, 0U, 0.2f);
+		}
 	}
 
 	// Do trace stuff
-	// ReceiveTestFire();
+	ReceiveTestFire();
 
-	return Super::TryBeginFire() && false;
+	return Super::TryBeginFire() && true;
 }
 
 
 bool AGreenWeapon::TryEndFire()
 {
-	return Super::TryEndFire() && false;
+	return Super::TryEndFire() && true;
 }
 
