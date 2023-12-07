@@ -39,12 +39,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		TObjectPtr<UStaticMeshComponent> TPMesh = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FTransform FPMeshRelativeTransform;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FTransform TPMeshRelativeTransform;
-
 public:
 	// Sets default values for this actor's properties
 	ABaseWeapon();
