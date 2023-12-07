@@ -45,8 +45,7 @@ void ABaseCharacter::BeginPlay()
 // Called when the game stops or when despawned
 void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	IFireable* WeaponFireable = GetFireable();
-	AActor* Weapon = Cast<AActor>(WeaponFireable);
+	TObjectPtr<AActor> Weapon = GetFireableActor();
 	if (IsValid(Weapon))
 	{
 		Weapon->Destroy();
