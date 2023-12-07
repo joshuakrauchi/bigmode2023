@@ -42,6 +42,17 @@ void ABaseCharacter::BeginPlay()
 	SpawnFireable();
 }
 
+// Called when the game stops or when despawned
+void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	IFireable* WeaponFireable = GetFireable();
+	AActor* Weapon = Cast<AActor>(WeaponFireable);
+	if (IsValid(Weapon))
+	{
+		Weapon->Destroy();
+	}
+}
+
 // Called every frame
 void ABaseCharacter::Tick(float DeltaTime)
 {
