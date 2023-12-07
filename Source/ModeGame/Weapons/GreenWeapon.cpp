@@ -4,7 +4,7 @@
 #include "GreenWeapon.h"
 #include "Math/UnrealMathUtility.h"
 
-AGreenWeapon::AGreenWeapon() : ABaseWeapon(10000.0f)
+AGreenWeapon::AGreenWeapon()
 {
 }
 

@@ -24,12 +24,6 @@ void AGameplayPC::BeginPlay()
 	if (!IsValid(EnhancedInputSubsystem)) { return; }
 
 	EnhancedInputSubsystem->AddMappingContext(GameplayInputMappingContext, 0);
-
-	TObjectPtr<ABaseCharacter> BaseCharacter = GetPawn<ABaseCharacter>();
-	if (IsValid(BaseCharacter))
-	{
-		BaseCharacter->SetFirstPersonMode(true);
-	}
 }
 
 void AGameplayPC::SetupInputComponent()
@@ -84,7 +78,7 @@ void AGameplayPC::OnFireTriggered(const FInputActionValue& Value)
 	TObjectPtr<ABaseCharacter> BaseCharacter = GetPawn<ABaseCharacter>();
 	if (!IsValid(BaseCharacter)) { return; }
 
-	IFireable* Fireable = BaseCharacter->GetFireable();
+	IFireable* Fireable = Cast<IFireable>(BaseCharacter->GetFireableActor());
 	if (Fireable == nullptr) { return; }
 
 	Fireable->TryBeginFire();
@@ -95,7 +89,7 @@ void AGameplayPC::OnFireCompleted(const FInputActionValue& Value)
 	TObjectPtr<ABaseCharacter> BaseCharacter = GetPawn<ABaseCharacter>();
 	if (!IsValid(BaseCharacter)) { return; }
 
-	IFireable* Fireable = BaseCharacter->GetFireable();
+	IFireable* Fireable = Cast<IFireable>(BaseCharacter->GetFireableActor());
 	if (Fireable == nullptr) { return; }
 
 	Fireable->TryEndFire();

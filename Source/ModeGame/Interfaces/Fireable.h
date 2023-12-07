@@ -6,8 +6,11 @@
 #include "UObject/Interface.h"
 #include "Fireable.generated.h"
 
+class UAimOffsetBlendSpace;
+class UAnimSequence;
+
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UFireable : public UInterface
 {
 	GENERATED_BODY()
@@ -29,5 +32,12 @@ public:
 		virtual bool TryEndFire() PURE_VIRTUAL(IFireable::TryEndFire, return false;);
 
 	UFUNCTION()
-		virtual bool TryEquipToParentTransform(const FTransform& Transform) PURE_VIRTUAL(IFireable::TryEquipToParentTransform, return false;);
+		virtual bool TryEquipToParentTransform(const FTransform& Transform, USkeletalMeshComponent* FPMeshAttachment, USkeletalMeshComponent* TPMeshAttachment, FName SocketName) PURE_VIRTUAL(IFireable::TryEquipToParentTransform, return false;);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		UAnimSequence* GetArmedAnimSequence() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		UAimOffsetBlendSpace* GetArmedAimOffset() const;
+
 };

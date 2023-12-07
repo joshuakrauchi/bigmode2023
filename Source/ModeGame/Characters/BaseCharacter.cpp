@@ -15,11 +15,13 @@ ABaseCharacter::ABaseCharacter()
 	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("FirstPersonMesh"));
 	FirstPersonMesh->SetupAttachment(FirstPersonCamera);
 	FirstPersonMesh->SetCastShadow(false);
+	FirstPersonMesh->SetOnlyOwnerSee(true);
 
 	TObjectPtr<USkeletalMeshComponent> ThirdPersonMesh = GetMesh();
 	if (IsValid(ThirdPersonMesh))
 	{
 		ThirdPersonMesh->SetCastHiddenShadow(true);
+		ThirdPersonMesh->SetOwnerNoSee(true);
 	}
 	
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -36,24 +38,8 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (IsValid(GetFirstPersonMesh()))
-	{
-		GetFirstPersonMesh()->SetHiddenInGame(!bIsFirstPersonMode);
-	}
 
-	USkeletalMeshComponent* ThirdPersonMesh = GetMesh();
-	if (IsValid(ThirdPersonMesh))
-	{
-		ThirdPersonMesh->SetHiddenInGame(bIsFirstPersonMode);
-	}
-
-	IFireable* Weapon = GetFireable();
-	UCameraComponent* Camera = GetFirstPersonCamera();
-	if (Weapon != nullptr && IsValid(Camera))
-	{
-		Weapon->TryEquipToParentTransform(Camera->GetComponentTransform());
-	}
+	SpawnFireable();
 }
 
 // Called every frame
@@ -64,24 +50,19 @@ void ABaseCharacter::Tick(float DeltaTime)
 	UpdateResetDoubleJump();
 }
 
-USkeletalMeshComponent* ABaseCharacter::GetFirstPersonMesh()
+USkeletalMeshComponent* ABaseCharacter::GetFirstPersonMesh() const
 {
 	return FirstPersonMesh;
 }
 
-bool ABaseCharacter::IsFirstPersonMode() const
+bool ABaseCharacter::HasFireable() const
 {
-	return bIsFirstPersonMode;
+	return (IsValid(FireableActor));
 }
 
-void ABaseCharacter::SetFirstPersonMode(bool bFirstPersonMode)
+AActor* ABaseCharacter::GetFireableActor() const
 {
-	bIsFirstPersonMode = bFirstPersonMode;
-}
-
-IFireable* ABaseCharacter::GetFireable()
-{
-	return Cast<IFireable>(FireableActor);
+	return FireableActor;
 }
 
 void ABaseCharacter::SetFireableActor(AActor* Actor)
@@ -89,7 +70,7 @@ void ABaseCharacter::SetFireableActor(AActor* Actor)
 	FireableActor = Actor;
 }
 
-UCameraComponent* ABaseCharacter::GetFirstPersonCamera()
+UCameraComponent* ABaseCharacter::GetFirstPersonCamera() const
 {
 	return FirstPersonCamera;
 }
@@ -124,6 +105,26 @@ void ABaseCharacter::DoubleJump()
 	Movement->Velocity = ImpulseVector;
 
 	bCanJumpAgain = false;
+}
+
+void ABaseCharacter::SpawnFireable()
+{
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	if (!IsValid(FireableClass)) { return; }
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	TObjectPtr<AActor> SpawnedFireableActor = World->SpawnActor<AActor>(FireableClass, FTransform(), SpawnParams);
+	SetFireableActor(SpawnedFireableActor);
+
+	UCameraComponent* Camera = GetFirstPersonCamera();
+	IFireable* Fireable = Cast<IFireable>(SpawnedFireableActor);
+	if (Fireable != nullptr && IsValid(Camera))
+	{
+		Fireable->TryEquipToParentTransform(Camera->GetComponentTransform(), FirstPersonMesh, GetMesh(), FName("weapon_r"));
+	}
 }
 
 void ABaseCharacter::UpdateResetDoubleJump()

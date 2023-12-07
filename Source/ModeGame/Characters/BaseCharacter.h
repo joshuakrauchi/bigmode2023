@@ -27,16 +27,16 @@ class MODEGAME_API ABaseCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-		bool bIsFirstPersonMode = false;
-
-private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		TObjectPtr<UCameraComponent> FirstPersonCamera = nullptr;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		TObjectPtr<USkeletalMeshComponent> FirstPersonMesh = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TObjectPtr<UClass> FireableClass = nullptr;
+
+private:
 	UPROPERTY()
 		TObjectPtr<AActor> FireableActor = nullptr;
 
@@ -62,21 +62,19 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-		USkeletalMeshComponent* GetFirstPersonMesh();
+		USkeletalMeshComponent* GetFirstPersonMesh() const;
 
 	UFUNCTION(BlueprintCallable)
-		bool IsFirstPersonMode() const;
+		bool HasFireable() const;
 
 	UFUNCTION(BlueprintCallable)
-		void SetFirstPersonMode(bool bFirstPersonMode);
-
-	IFireable* GetFireable();
+		AActor* GetFireableActor() const;
 
 	UFUNCTION(BlueprintCallable)
 		void SetFireableActor(AActor* Actor);
 
 	UFUNCTION(BlueprintCallable)
-		UCameraComponent* GetFirstPersonCamera();
+		UCameraComponent* GetFirstPersonCamera() const;
 
 	UFUNCTION(BlueprintCallable)
 		void ResetDoubleJump();
@@ -89,8 +87,9 @@ public:
 
 private:
 	UFUNCTION()
-		void UpdateResetDoubleJump();
+		void SpawnFireable();
 
-protected:
+	UFUNCTION()
+		void UpdateResetDoubleJump();
 
 };
