@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/Damageable.h"
 #include "BaseCharacter.generated.h"
 
 class IFireable;
@@ -22,21 +23,24 @@ enum class ECharacterType : uint8
 };
 
 UCLASS()
-class MODEGAME_API ABaseCharacter : public ACharacter
+class MODEGAME_API ABaseCharacter : public ACharacter, public IDamageable
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-		bool bIsFirstPersonMode = false;
-
-private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		TObjectPtr<UCameraComponent> FirstPersonCamera = nullptr;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		TObjectPtr<USkeletalMeshComponent> FirstPersonMesh = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TObjectPtr<UClass> FireableClass = nullptr;
+	
+	UPROPERTY(EditAnywhere)
+		float BaseHealth = 0;
+
+private:
 	UPROPERTY()
 		TObjectPtr<AActor> FireableActor = nullptr;
 
@@ -49,6 +53,9 @@ private:
 	UPROPERTY(EditAnywhere)
 		float DoubleJumpHeight = 600.0f;
 
+	UPROPERTY()
+		float CurrentHealth = 0;
+
 public:
 	// Sets default values for this character's properties
 	ABaseCharacter();
@@ -57,26 +64,29 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Called when the game stops or when despawned
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-		USkeletalMeshComponent* GetFirstPersonMesh();
+	virtual void OnDamaged_Implementation(float DamageAmount) override;
 
 	UFUNCTION(BlueprintCallable)
-		bool IsFirstPersonMode() const;
+		USkeletalMeshComponent* GetFirstPersonMesh() const;
 
 	UFUNCTION(BlueprintCallable)
-		void SetFirstPersonMode(bool bFirstPersonMode);
+		bool HasFireable() const;
 
-	IFireable* GetFireable();
+	UFUNCTION(BlueprintCallable)
+		AActor* GetFireableActor() const;
 
 	UFUNCTION(BlueprintCallable)
 		void SetFireableActor(AActor* Actor);
 
 	UFUNCTION(BlueprintCallable)
-		UCameraComponent* GetFirstPersonCamera();
+		UCameraComponent* GetFirstPersonCamera() const;
 
 	UFUNCTION(BlueprintCallable)
 		void ResetDoubleJump();
@@ -87,6 +97,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DoubleJump();
 
-protected:
+private:
+	UFUNCTION()
+		void SpawnFireable();
+
+	UFUNCTION()
+		void UpdateResetDoubleJump();
+
+	UFUNCTION()
+		void OnHealthDepleted();
 
 };

@@ -3,6 +3,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerControllers/GameplayPC.h"
+#include "../GameStates/GameplayGS.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -15,11 +16,13 @@ ABaseCharacter::ABaseCharacter()
 	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("FirstPersonMesh"));
 	FirstPersonMesh->SetupAttachment(FirstPersonCamera);
 	FirstPersonMesh->SetCastShadow(false);
+	FirstPersonMesh->SetOnlyOwnerSee(true);
 
 	TObjectPtr<USkeletalMeshComponent> ThirdPersonMesh = GetMesh();
 	if (IsValid(ThirdPersonMesh))
 	{
 		ThirdPersonMesh->SetCastHiddenShadow(true);
+		ThirdPersonMesh->SetOwnerNoSee(true);
 	}
 	
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -36,23 +39,19 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (IsValid(GetFirstPersonMesh()))
-	{
-		GetFirstPersonMesh()->SetHiddenInGame(!bIsFirstPersonMode);
-	}
 
-	USkeletalMeshComponent* ThirdPersonMesh = GetMesh();
-	if (IsValid(ThirdPersonMesh))
-	{
-		ThirdPersonMesh->SetHiddenInGame(bIsFirstPersonMode);
-	}
+	CurrentHealth = BaseHealth;
 
-	IFireable* Weapon = GetFireable();
-	UCameraComponent* Camera = GetFirstPersonCamera();
-	if (Weapon != nullptr && IsValid(Camera))
+	SpawnFireable();
+}
+
+// Called when the game stops or when despawned
+void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	TObjectPtr<AActor> Weapon = GetFireableActor();
+	if (IsValid(Weapon))
 	{
-		Weapon->TryEquipToParentTransform(Camera->GetComponentTransform());
+		Weapon->Destroy();
 	}
 }
 
@@ -61,26 +60,46 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UpdateResetDoubleJump();
 }
 
-USkeletalMeshComponent* ABaseCharacter::GetFirstPersonMesh()
+void ABaseCharacter::OnDamaged_Implementation(float DamageAmount)
+{
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	if (IsPlayerControlled())
+	{
+		TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+		if (IsValid(GameplayGS))
+		{
+			GameplayGS->DecreaseHealth(DamageAmount);
+		}
+	}
+	else
+	{
+		CurrentHealth -= DamageAmount;
+
+		if (CurrentHealth <= 0.0f)
+		{
+			OnHealthDepleted();
+		}
+	}
+}
+
+USkeletalMeshComponent* ABaseCharacter::GetFirstPersonMesh() const
 {
 	return FirstPersonMesh;
 }
 
-bool ABaseCharacter::IsFirstPersonMode() const
+bool ABaseCharacter::HasFireable() const
 {
-	return bIsFirstPersonMode;
+	return (IsValid(FireableActor));
 }
 
-void ABaseCharacter::SetFirstPersonMode(bool bFirstPersonMode)
+AActor* ABaseCharacter::GetFireableActor() const
 {
-	bIsFirstPersonMode = bFirstPersonMode;
-}
-
-IFireable* ABaseCharacter::GetFireable()
-{
-	return Cast<IFireable>(FireableActor);
+	return FireableActor;
 }
 
 void ABaseCharacter::SetFireableActor(AActor* Actor)
@@ -88,7 +107,7 @@ void ABaseCharacter::SetFireableActor(AActor* Actor)
 	FireableActor = Actor;
 }
 
-UCameraComponent* ABaseCharacter::GetFirstPersonCamera()
+UCameraComponent* ABaseCharacter::GetFirstPersonCamera() const
 {
 	return FirstPersonCamera;
 }
@@ -123,4 +142,40 @@ void ABaseCharacter::DoubleJump()
 	Movement->Velocity = ImpulseVector;
 
 	bCanJumpAgain = false;
+}
+
+void ABaseCharacter::SpawnFireable()
+{
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	if (!IsValid(FireableClass)) { return; }
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	TObjectPtr<AActor> SpawnedFireableActor = World->SpawnActor<AActor>(FireableClass, FTransform(), SpawnParams);
+	SetFireableActor(SpawnedFireableActor);
+
+	UCameraComponent* Camera = GetFirstPersonCamera();
+	IFireable* Fireable = Cast<IFireable>(SpawnedFireableActor);
+	if (Fireable != nullptr && IsValid(Camera))
+	{
+		Fireable->TryEquipToParentTransform(Camera->GetComponentTransform(), FirstPersonMesh, GetMesh(), FName("weapon_r"));
+	}
+}
+
+void ABaseCharacter::UpdateResetDoubleJump()
+{
+	TObjectPtr<UCharacterMovementComponent> Movement = GetCharacterMovement();
+	if (!IsValid(Movement)) { return; }
+
+	if (!Movement->IsFalling())
+	{
+		ResetDoubleJump();
+	}
+}
+
+void ABaseCharacter::OnHealthDepleted()
+{
+	Destroy();
 }
