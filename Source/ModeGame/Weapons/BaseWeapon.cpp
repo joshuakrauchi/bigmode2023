@@ -39,6 +39,11 @@ bool ABaseWeapon::TryEndFire()
 	return true;
 }
 
+float ABaseWeapon::GetFalloffAdjustedDamage(float Distance)
+{
+	return BaseDamage * (1 / Distance);
+}
+
 bool ABaseWeapon::TryEquipToParentTransform(const FTransform& Transform)
 {
 	return (EquippedTransform = &Transform) != nullptr;

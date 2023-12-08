@@ -4,7 +4,8 @@
 #include "GreenWeapon.h"
 #include "Math/UnrealMathUtility.h"
 
-AGreenWeapon::AGreenWeapon() : ABaseWeapon(10000.0f)
+AGreenWeapon::AGreenWeapon() : ABaseWeapon(10000.0f,
+										   EPlayableColours::Green)
 {
 }
 
@@ -36,6 +37,12 @@ bool AGreenWeapon::TryBeginFire()
 			FVector AdjustedForward = (ParentForward + RandomSpread) * MaxRange;
 
 			World->LineTraceSingleByChannel(Trace, ParentLocation, ParentLocation + AdjustedForward, ECollisionChannel::ECC_Visibility);
+			AActor* HitActor = Trace.GetActor();
+			if (IsValid(HitActor))
+			{
+				// Find IDamageable component on actor and hit it
+				// HitActor->
+			}
 
 			// Visual debug component
 			DrawDebugLine(World, ParentLocation, ParentLocation + AdjustedForward, { 255, 0, 0 }, false, 3.0f, 0U, 0.2f);
