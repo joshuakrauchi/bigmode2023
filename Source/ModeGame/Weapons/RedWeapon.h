@@ -13,5 +13,16 @@ UCLASS()
 class MODEGAME_API ARedWeapon : public ABaseWeapon
 {
 	GENERATED_BODY()
+
+public:
+	virtual bool TryBeginFire() override;
+
+	virtual bool TryEndFire() override;
 	
+	UFUNCTION(BlueprintImplementableEvent)
+		bool ReceiveTestFire();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		bool ReceiveEndFire();
+
 };

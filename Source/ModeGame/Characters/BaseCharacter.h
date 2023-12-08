@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/Damageable.h"
 #include "BaseCharacter.generated.h"
 
 class IFireable;
@@ -22,7 +23,7 @@ enum class ECharacterType : uint8
 };
 
 UCLASS()
-class MODEGAME_API ABaseCharacter : public ACharacter
+class MODEGAME_API ABaseCharacter : public ACharacter, public IDamageable
 {
 	GENERATED_BODY()
 
@@ -35,6 +36,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TObjectPtr<UClass> FireableClass = nullptr;
+	
+	UPROPERTY(EditAnywhere)
+		float BaseHealth = 0;
 
 private:
 	UPROPERTY()
@@ -48,6 +52,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 		float DoubleJumpHeight = 600.0f;
+
+	UPROPERTY()
+		float CurrentHealth = 0;
 
 public:
 	// Sets default values for this character's properties
@@ -63,6 +70,8 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void OnDamaged_Implementation(float DamageAmount) override;
 
 	UFUNCTION(BlueprintCallable)
 		USkeletalMeshComponent* GetFirstPersonMesh() const;
@@ -94,5 +103,8 @@ private:
 
 	UFUNCTION()
 		void UpdateResetDoubleJump();
+
+	UFUNCTION()
+		void OnHealthDepleted();
 
 };

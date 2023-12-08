@@ -3,6 +3,7 @@
 
 #include "BaseWeapon.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 ABaseWeapon::ABaseWeapon()
@@ -13,17 +14,18 @@ ABaseWeapon::ABaseWeapon()
 	EmptyRoot = CreateDefaultSubobject<USceneComponent>(FName("EmptyRoot"));
 	SetRootComponent(EmptyRoot);
 
-	FPMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("FPMesh"));
-	FPMesh->SetupAttachment(GetRootComponent());
-	FPMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	FPMesh->SetCastShadow(false);
-	FPMesh->SetOnlyOwnerSee(true);
+	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("FirstPersonMesh"));
+	FirstPersonMesh->SetupAttachment(GetRootComponent());
+	FirstPersonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FirstPersonMesh->SetCastShadow(false);
+	FirstPersonMesh->SetOnlyOwnerSee(true);
 
-	TPMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("TPMesh"));
-	TPMesh->SetupAttachment(GetRootComponent());
-	TPMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	TPMesh->SetCastHiddenShadow(true);
-	TPMesh->SetOwnerNoSee(true);
+	ThirdPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("ThirdPersonMesh"));
+	ThirdPersonMesh->SetupAttachment(GetRootComponent());
+	ThirdPersonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ThirdPersonMesh->SetCastHiddenShadow(true);
+	ThirdPersonMesh->SetOwnerNoSee(true);
+
 }
 
 // Called when the game starts or when spawned
@@ -58,10 +60,25 @@ bool ABaseWeapon::TryEquipToParentTransform(const FTransform& Transform, USkelet
 {
 	if ((EquippedTransform = &Transform) == nullptr) { return false; }
 
-	FPMesh->AttachToComponent(FPMeshAttachment, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
-	TPMesh->AttachToComponent(TPMeshAttachment, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
+	FirstPersonMesh->AttachToComponent(FPMeshAttachment, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
+	ThirdPersonMesh->AttachToComponent(TPMeshAttachment, FAttachmentTransformRules::KeepRelativeTransform, SocketName);
 
 	return true;
+}
+
+USkeletalMeshComponent* ABaseWeapon::GetVisibleMesh() const
+{
+	TObjectPtr<APawn> WeaponOwner = GetOwner<APawn>();
+	if (!IsValid(WeaponOwner)) { return nullptr; }
+
+	if (WeaponOwner->IsPlayerControlled())
+	{
+		return FirstPersonMesh;
+	}
+	else
+	{
+		return ThirdPersonMesh;
+	}
 }
 
 UAnimSequence* ABaseWeapon::GetArmedAnimSequence_Implementation() const

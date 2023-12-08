@@ -3,6 +3,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerControllers/GameplayPC.h"
+#include "../GameStates/GameplayGS.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -39,6 +40,8 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CurrentHealth = BaseHealth;
+
 	SpawnFireable();
 }
 
@@ -58,6 +61,30 @@ void ABaseCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	UpdateResetDoubleJump();
+}
+
+void ABaseCharacter::OnDamaged_Implementation(float DamageAmount)
+{
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	if (IsPlayerControlled())
+	{
+		TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+		if (IsValid(GameplayGS))
+		{
+			GameplayGS->DecreaseHealth(DamageAmount);
+		}
+	}
+	else
+	{
+		CurrentHealth -= DamageAmount;
+
+		if (CurrentHealth <= 0.0f)
+		{
+			OnHealthDepleted();
+		}
+	}
 }
 
 USkeletalMeshComponent* ABaseCharacter::GetFirstPersonMesh() const
@@ -146,4 +173,9 @@ void ABaseCharacter::UpdateResetDoubleJump()
 	{
 		ResetDoubleJump();
 	}
+}
+
+void ABaseCharacter::OnHealthDepleted()
+{
+	Destroy();
 }

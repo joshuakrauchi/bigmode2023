@@ -9,6 +9,7 @@
 
 class UAnimSequence;
 class UAimOffsetBlendSpace;
+class USkeletalMeshComponent;
 
 UCLASS()
 class MODEGAME_API ABaseWeapon : public AActor, public IFireable
@@ -34,10 +35,10 @@ protected:
 		TObjectPtr<USceneComponent> EmptyRoot = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		TObjectPtr<UStaticMeshComponent> FPMesh = nullptr;
+		TObjectPtr<USkeletalMeshComponent> FirstPersonMesh = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		TObjectPtr<UStaticMeshComponent> TPMesh = nullptr;
+		TObjectPtr<USkeletalMeshComponent> ThirdPersonMesh = nullptr;
 
 public:
 	// Sets default values for this actor's properties
@@ -64,5 +65,8 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 		const FTransform& GetEquippedTransform() { return *EquippedTransform; }
+
+	UFUNCTION(BlueprintCallable)
+		USkeletalMeshComponent* GetVisibleMesh() const;
 
 };

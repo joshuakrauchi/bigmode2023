@@ -3,3 +3,12 @@
 
 #include "Weapons/RedWeapon.h"
 
+bool ARedWeapon::TryBeginFire()
+{
+	return (Super::TryBeginFire() && ReceiveTestFire());
+}
+
+bool ARedWeapon::TryEndFire()
+{
+	return (Super::TryEndFire() && ReceiveEndFire());
+}
