@@ -63,7 +63,7 @@ void ABaseCharacter::Tick(float DeltaTime)
 	UpdateResetDoubleJump();
 }
 
-void ABaseCharacter::OnDamaged_Implementation(float DamageAmount)
+void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColours SourceColour)
 {
 	TObjectPtr<UWorld> World = GetWorld();
 	if (!IsValid(World)) { return; }

@@ -71,7 +71,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnDamaged_Implementation(float DamageAmount) override;
+	virtual void OnDamaged_Implementation(float DamageAmount, EPlayableColours SourceColour = EPlayableColours::None) override;
 
 	UFUNCTION(BlueprintCallable)
 		USkeletalMeshComponent* GetFirstPersonMesh() const;

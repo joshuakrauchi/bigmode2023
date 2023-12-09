@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Utils/EPlayableColours.h"
 #include "Damageable.generated.h"
 
 // This class does not need to be modified.
@@ -23,6 +24,6 @@ class MODEGAME_API IDamageable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		void OnDamaged(float DamageAmount);
+		void OnDamaged(float DamageAmount, EPlayableColours SourceColour = EPlayableColours::None);
 
 };

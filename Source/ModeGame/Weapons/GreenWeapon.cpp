@@ -3,10 +3,13 @@
 
 #include "GreenWeapon.h"
 #include "Math/UnrealMathUtility.h"
+#include "Characters/BaseCharacter.h"
 
-AGreenWeapon::AGreenWeapon() : ABaseWeapon(10000.0f,
-										   EPlayableColours::Green)
+AGreenWeapon::AGreenWeapon()
 {
+	MaxRange = 10000.0f;
+	Colour = EPlayableColours::Green;
+	BaseDamage = 5.0f;
 }
 
 void AGreenWeapon::BeginPlay()
@@ -28,20 +31,21 @@ bool AGreenWeapon::TryBeginFire()
 
 	if (IsValid(World)) 
 	{
-		FHitResult Trace;
+		FHitResult Trace { };
 
 		// Finds hits
 		for (int i = 0; i < MaxPellets; ++i)
 		{
 			FVector RandomSpread { FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians), FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians), FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians) };
 			FVector AdjustedForward = (ParentForward + RandomSpread) * MaxRange;
+			FCollisionQueryParams CollisionParams {};
+			CollisionParams.AddIgnoredActor(GetOwner());
 
-			World->LineTraceSingleByChannel(Trace, ParentLocation, ParentLocation + AdjustedForward, ECollisionChannel::ECC_Visibility);
-			AActor* HitActor = Trace.GetActor();
-			if (IsValid(HitActor))
+			World->LineTraceSingleByChannel(Trace, ParentLocation, ParentLocation + AdjustedForward, ECollisionChannel::ECC_Visibility, CollisionParams);
+			ABaseCharacter* HitCharacter = Cast<ABaseCharacter>(Trace.GetActor());
+			if (HitCharacter != nullptr)
 			{
-				// Find IDamageable component on actor and hit it
-				// HitActor->
+				IDamageable::Execute_OnDamaged(HitCharacter, GetFalloffAdjustedDamage(Trace.Distance), Colour);
 			}
 
 			// Visual debug component
