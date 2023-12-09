@@ -4,6 +4,7 @@
 #include "BaseWeapon.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Characters/BaseCharacter.h"
 
 // Sets default values
 ABaseWeapon::ABaseWeapon()
@@ -44,15 +45,11 @@ void ABaseWeapon::Tick(float DeltaTime)
 
 bool ABaseWeapon::TryBeginFire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BEGIN FIRE"));
-
 	return true;
 }
 
 bool ABaseWeapon::TryEndFire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("END FIRE"));
-
 	return true;
 }
 
@@ -66,7 +63,7 @@ bool ABaseWeapon::TryEquipToParentTransform(const FTransform& Transform, USkelet
 	return true;
 }
 
-float ABaseWeapon::GetFalloffAdjustedDamage(float Distance)
+float ABaseWeapon::GetFalloffAdjustedDamage(float Distance) const
 {
 	return BaseDamage * (1 / Distance);
 }
@@ -84,6 +81,24 @@ USkeletalMeshComponent* ABaseWeapon::GetVisibleMesh() const
 	{
 		return ThirdPersonMesh;
 	}
+}
+
+bool ABaseWeapon::TryDamageDamageable(TScriptInterface<IDamageable> Damageable, float Distance)
+{
+	TObjectPtr<ABaseCharacter> BaseCharacter = GetOwner<ABaseCharacter>();
+	if (!IsValid(BaseCharacter)) { return false; }
+
+	TObjectPtr<APawn> DamageablePawn = Cast<APawn>(Damageable.GetInterface());
+	if (!IsValid(DamageablePawn)) { return false; }
+	
+	if (BaseCharacter->IsPlayerControlled() == DamageablePawn->IsPlayerControlled())
+	{
+		return false;
+	}
+
+	IDamageable::Execute_OnDamaged(DamageablePawn, BaseDamage * GetFalloffAdjustedDamage(Distance), BaseCharacter->CharacterColour);
+
+	return true;
 }
 
 UAnimSequence* ABaseWeapon::GetArmedAnimSequence_Implementation() const

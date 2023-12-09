@@ -11,6 +11,7 @@
 class UAnimSequence;
 class UAimOffsetBlendSpace;
 class USkeletalMeshComponent;
+class IDamageable;
 
 UCLASS()
 class MODEGAME_API ABaseWeapon : public AActor, public IFireable
@@ -18,16 +19,15 @@ class MODEGAME_API ABaseWeapon : public AActor, public IFireable
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float MaxRange = 0.0f;
+
 	UPROPERTY(EditAnywhere)
 		float BaseDamage = 0.0f;
+
 	UPROPERTY(EditAnywhere)
 		float DamageFalloffRange = 0.0f;
-	UPROPERTY(EditAnywhere)
-		EPlayableColours Colour = EPlayableColours::None;
-	/*UPROPERTY(EditAnywhere)
-		FCollisionQueryParams CollisionQuery { };*/
+
 	
 	const FTransform* EquippedTransform = nullptr;
 
@@ -71,17 +71,20 @@ public:
 	// end IFireable
 
 public:
-	virtual float GetFalloffAdjustedDamage(float Distance);
+	UFUNCTION(BlueprintCallable)
+		virtual float GetFalloffAdjustedDamage(float Distance) const;
 
 	virtual UAnimSequence* GetArmedAnimSequence_Implementation() const override;
 
 	virtual UAimOffsetBlendSpace* GetArmedAimOffset_Implementation() const override;
 
-public:
 	UFUNCTION(BlueprintCallable)
 		const FTransform& GetEquippedTransform() { return *EquippedTransform; }
 
 	UFUNCTION(BlueprintCallable)
 		USkeletalMeshComponent* GetVisibleMesh() const;
+
+	UFUNCTION(BlueprintCallable)
+		bool TryDamageDamageable(TScriptInterface<IDamageable> Damageable, float Distance);
 
 };

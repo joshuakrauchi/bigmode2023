@@ -8,7 +8,6 @@
 AGreenWeapon::AGreenWeapon()
 {
 	MaxRange = 10000.0f;
-	Colour = EPlayableColours::Green;
 	BaseDamage = 5.0f;
 }
 
@@ -24,6 +23,9 @@ void AGreenWeapon::Tick(float DeltaTime)
 
 bool AGreenWeapon::TryBeginFire()
 {
+	TObjectPtr<ABaseCharacter> BaseCharacter = GetOwner<ABaseCharacter>();
+	if (!IsValid(BaseCharacter)) { return false; }
+
 	FVector ParentLocation = EquippedTransform->GetLocation();
 	FVector ParentForward = EquippedTransform->GetRotation().GetForwardVector();
 
@@ -45,7 +47,7 @@ bool AGreenWeapon::TryBeginFire()
 			ABaseCharacter* HitCharacter = Cast<ABaseCharacter>(Trace.GetActor());
 			if (HitCharacter != nullptr)
 			{
-				IDamageable::Execute_OnDamaged(HitCharacter, GetFalloffAdjustedDamage(Trace.Distance), Colour);
+				IDamageable::Execute_OnDamaged(HitCharacter, GetFalloffAdjustedDamage(Trace.Distance), BaseCharacter->CharacterColour);
 			}
 
 			// Visual debug component
