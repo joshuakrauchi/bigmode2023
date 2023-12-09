@@ -21,7 +21,7 @@ void USpawnManagerComponent::BeginPlay()
 
 	for (const FSpawnInfo& SpawnInfo : SpawnInfos)
 	{
-		TimeBeforeSpawnByClass.Add(SpawnInfo.ActorClass, SpawnInfo.BaseTimeBeforeSpawn);
+		TimeBeforeSpawnByClass.Add(SpawnInfo.ActorClass, SpawnInfo.InitialTimeBeforeSpawn);
 	}
 }
 
@@ -42,7 +42,7 @@ void USpawnManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 			if (bSpawnSucceeded)
 			{
-				TimeBeforeSpawn = (SpawnInfo.BaseTimeBeforeSpawn * CurrentSpawnTimeMultiplier);
+				TimeBeforeSpawn = (SpawnInfo.BaseTimeBetweenSpawns * CurrentSpawnTimeMultiplier);
 			}
 		}
 	}

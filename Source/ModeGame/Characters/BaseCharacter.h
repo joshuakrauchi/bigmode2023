@@ -9,19 +9,6 @@ class IFireable;
 class UCameraComponent;
 class USkeletalMeshComponent;
 
-UENUM()
-enum class ECharacterType : uint8
-{
-	None,
-
-	Grey,
-	Red,
-	Green,
-	Blue,
-
-	Count,
-};
-
 UCLASS()
 class MODEGAME_API ABaseCharacter : public ACharacter, public IDamageable
 {
@@ -39,6 +26,9 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 		float BaseHealth = 0;
+
+	UPROPERTY(EditAnywhere)
+		EPlayableColours CharacterColour = EPlayableColours::None;
 
 private:
 	UPROPERTY()

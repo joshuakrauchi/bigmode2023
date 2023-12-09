@@ -18,7 +18,10 @@ public:
 		TObjectPtr<UClass> ActorClass = nullptr;
 
 	UPROPERTY(EditAnywhere)
-		float BaseTimeBeforeSpawn = 0.0f;
+		float InitialTimeBeforeSpawn = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float BaseTimeBetweenSpawns = 0.0f;
 };
 
 UCLASS()
