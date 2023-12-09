@@ -4,6 +4,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerControllers/GameplayPC.h"
 #include "../GameStates/GameplayGS.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -61,12 +62,26 @@ void ABaseCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	UpdateResetDoubleJump();
+	UpdateIsExhausted();
+}
+
+void ABaseCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	IFireable* Fireable = Cast<IFireable>(GetFireableActor());
+	if (Fireable != nullptr)
+	{
+		Fireable->TryEndFire();
+	}
 }
 
 void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColours SourceColour)
 {
 	TObjectPtr<UWorld> World = GetWorld();
 	if (!IsValid(World)) { return; }
+
+	float TotalDamage = (DamageAmount * GetIncomingDamageMultiplierForColour(SourceColour));
 
 	if (IsPlayerControlled())
 	{
@@ -144,6 +159,43 @@ void ABaseCharacter::DoubleJump()
 	bCanJumpAgain = false;
 }
 
+bool ABaseCharacter::GetIsExhausted() const
+{
+	return bIsExhausted;
+}
+
+void ABaseCharacter::SetIsExhausted(bool bExhausted)
+{
+	bIsExhausted = bExhausted;
+}
+
+bool ABaseCharacter::CanBePossessed() const
+{
+	return GetIsExhausted();
+}
+
+FVector ABaseCharacter::GetProjectileStartLocation() const
+{
+	TObjectPtr<UCameraComponent> Camera = GetFirstPersonCamera();
+	if (!IsValid(Camera)) { return FVector::Zero(); }
+
+	return (Camera->GetForwardVector() + Camera->GetComponentLocation());
+}
+
+FVector ABaseCharacter::GetProjectileEndLocation(float Range, float ScatterRange) const
+{
+	FVector Movement = UKismetMathLibrary::GetForwardVector(GetControlRotation());
+
+	if (ScatterRange > 0.0f)
+	{
+		float HalfRange = (ScatterRange / 2.0f);
+		FRotator RandomRotation = FRotator(FMath::RandRange(-HalfRange, HalfRange), FMath::RandRange(-HalfRange, HalfRange), 0.0f);
+		Movement = RandomRotation.RotateVector(Movement);
+	}
+
+	return ((Movement * Range) + GetActorLocation());
+}
+
 void ABaseCharacter::SpawnFireable()
 {
 	TObjectPtr<UWorld> World = GetWorld();
@@ -178,4 +230,62 @@ void ABaseCharacter::UpdateResetDoubleJump()
 void ABaseCharacter::OnHealthDepleted()
 {
 	Destroy();
+}
+
+void ABaseCharacter::UpdateIsExhausted()
+{
+	SetIsExhausted(!IsPlayerControlled() && (CurrentHealth <= (BaseHealth * ExhaustedHealthMultiplierThreshold)));
+}
+
+float ABaseCharacter::GetIncomingDamageMultiplierForColour(EPlayableColours IncomingDamageColour)
+{
+	if (CharacterColour == IncomingDamageColour)
+	{
+		return SameColourDamageMultiplier;
+	}
+
+	switch (CharacterColour)
+	{
+	case EPlayableColours::Red:
+	{
+		if (IncomingDamageColour == EPlayableColours::Blue)
+		{
+			return WeakAgainstColourDamageMultiplier;
+		}
+		else if (IncomingDamageColour == EPlayableColours::Green)
+		{
+			return StrongAgainstColourDamageMultiplier;
+		}
+	}
+	break;
+	case EPlayableColours::Green:
+	{
+		if (IncomingDamageColour == EPlayableColours::Red)
+		{
+			return WeakAgainstColourDamageMultiplier;
+		}
+		else if (IncomingDamageColour == EPlayableColours::Blue)
+		{
+			return StrongAgainstColourDamageMultiplier;
+		}
+	}
+	break;
+	case EPlayableColours::Blue:
+		if (IncomingDamageColour == EPlayableColours::Green)
+		{
+			return WeakAgainstColourDamageMultiplier;
+		}
+		else if (IncomingDamageColour == EPlayableColours::Red)
+		{
+			return StrongAgainstColourDamageMultiplier;
+		}
+		break;
+	case EPlayableColours::Grey:
+	case EPlayableColours::None:
+	case EPlayableColours::Count:
+	default:
+		break;
+	}
+
+	return 1.0f;
 }

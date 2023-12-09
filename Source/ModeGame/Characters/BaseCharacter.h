@@ -30,6 +30,18 @@ public:
 	UPROPERTY(EditAnywhere)
 		EPlayableColours CharacterColour = EPlayableColours::None;
 
+	UPROPERTY(EditAnywhere)
+		float ExhaustedHealthMultiplierThreshold = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float SameColourDamageMultiplier = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float StrongAgainstColourDamageMultiplier = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float WeakAgainstColourDamageMultiplier = 0.0f;
+
 private:
 	UPROPERTY()
 		TObjectPtr<AActor> FireableActor = nullptr;
@@ -46,6 +58,9 @@ private:
 	UPROPERTY()
 		float CurrentHealth = 0;
 
+	UPROPERTY()
+		bool bIsExhausted = false;
+
 public:
 	// Sets default values for this character's properties
 	ABaseCharacter();
@@ -60,6 +75,8 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void OnDamaged_Implementation(float DamageAmount, EPlayableColours SourceColour = EPlayableColours::None) override;
 
@@ -87,6 +104,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DoubleJump();
 
+	UFUNCTION(BlueprintCallable)
+		bool GetIsExhausted() const;
+
+	UFUNCTION(BlueprintCallable)
+		void SetIsExhausted(bool bExhausted);
+
+	UFUNCTION(BlueprintCallable)
+		bool CanBePossessed() const;
+
+	UFUNCTION(BlueprintCallable)
+		FVector GetProjectileStartLocation() const;
+
+	UFUNCTION(BlueprintCallable)
+		FVector GetProjectileEndLocation(float Range, float ScatterRange) const;
+
 private:
 	UFUNCTION()
 		void SpawnFireable();
@@ -96,5 +128,11 @@ private:
 
 	UFUNCTION()
 		void OnHealthDepleted();
+
+	UFUNCTION()
+		void UpdateIsExhausted();
+
+	UFUNCTION()
+		float GetIncomingDamageMultiplierForColour(EPlayableColours IncomingDamageColour);
 
 };
