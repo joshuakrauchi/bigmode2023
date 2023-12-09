@@ -29,7 +29,7 @@ void UBTService_UpdateEnemyInfo::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 		Blackboard->SetValueAsBool(OutIsFalling.SelectedKeyName, CharacterMovement->IsFalling());
 	}
 
-	Blackboard->SetValueAsBool(OutIsExhausted.SelectedKeyName, BaseCharacter->GetIsExhausted());
+	Blackboard->SetValueAsBool(OutIsExhausted.SelectedKeyName, BaseCharacter->IsExhausted());
 
 	UpdatePlayerInfo(Blackboard, BaseCharacter);
 }

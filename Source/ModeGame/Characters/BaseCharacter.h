@@ -42,6 +42,9 @@ public:
 	UPROPERTY(EditAnywhere)
 		float WeakAgainstColourDamageMultiplier = 0.0f;
 
+	UPROPERTY(EditAnywhere)
+		float BaseInvincibilityTime = 0.0f;
+
 private:
 	UPROPERTY()
 		TObjectPtr<AActor> FireableActor = nullptr;
@@ -59,7 +62,7 @@ private:
 		float CurrentHealth = 0;
 
 	UPROPERTY()
-		bool bIsExhausted = false;
+		float CurrentInvincibilityTime = 0.0f;
 
 public:
 	// Sets default values for this character's properties
@@ -74,7 +77,7 @@ protected:
 
 public:
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void PossessedBy(AController* NewController) override;
 
@@ -105,10 +108,7 @@ public:
 		void DoubleJump();
 
 	UFUNCTION(BlueprintCallable)
-		bool GetIsExhausted() const;
-
-	UFUNCTION(BlueprintCallable)
-		void SetIsExhausted(bool bExhausted);
+		bool IsExhausted() const;
 
 	UFUNCTION(BlueprintCallable)
 		bool CanBePossessed() const;
@@ -118,6 +118,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		FVector GetProjectileEndLocation(float Range, float ScatterRange) const;
+
+	UFUNCTION()
+		bool IsInvincible() const;
 
 private:
 	UFUNCTION()
@@ -130,9 +133,8 @@ private:
 		void OnHealthDepleted();
 
 	UFUNCTION()
-		void UpdateIsExhausted();
-
-	UFUNCTION()
 		float GetIncomingDamageMultiplierForColour(EPlayableColours IncomingDamageColour);
 
+	UFUNCTION()
+		void UpdateInvincibility(float DeltaSeconds);
 };

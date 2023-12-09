@@ -57,12 +57,12 @@ void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 }
 
 // Called every frame
-void ABaseCharacter::Tick(float DeltaTime)
+void ABaseCharacter::Tick(float DeltaSeconds)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(DeltaSeconds);
 
 	UpdateResetDoubleJump();
-	UpdateIsExhausted();
+	UpdateInvincibility(DeltaSeconds);
 }
 
 void ABaseCharacter::PossessedBy(AController* NewController)
@@ -78,6 +78,8 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 
 void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColours SourceColour)
 {
+	if (IsInvincible()) { return; }
+
 	TObjectPtr<UWorld> World = GetWorld();
 	if (!IsValid(World)) { return; }
 
@@ -93,9 +95,15 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColou
 	}
 	else
 	{
+		bool bWasExhausted = IsExhausted();
+
 		CurrentHealth -= DamageAmount;
 
-		if (CurrentHealth <= 0.0f)
+		if (IsExhausted() && !bWasExhausted)
+		{
+			CurrentInvincibilityTime = BaseInvincibilityTime;
+		}
+		else if (CurrentHealth <= 0.0f)
 		{
 			OnHealthDepleted();
 		}
@@ -159,19 +167,14 @@ void ABaseCharacter::DoubleJump()
 	bCanJumpAgain = false;
 }
 
-bool ABaseCharacter::GetIsExhausted() const
+bool ABaseCharacter::IsExhausted() const
 {
-	return bIsExhausted;
-}
-
-void ABaseCharacter::SetIsExhausted(bool bExhausted)
-{
-	bIsExhausted = bExhausted;
+	return (!IsPlayerControlled() && (CurrentHealth <= (BaseHealth * ExhaustedHealthMultiplierThreshold)));
 }
 
 bool ABaseCharacter::CanBePossessed() const
 {
-	return GetIsExhausted();
+	return IsExhausted();
 }
 
 FVector ABaseCharacter::GetProjectileStartLocation() const
@@ -194,6 +197,11 @@ FVector ABaseCharacter::GetProjectileEndLocation(float Range, float ScatterRange
 	}
 
 	return ((Movement * Range) + GetActorLocation());
+}
+
+bool ABaseCharacter::IsInvincible() const
+{
+	return (CurrentInvincibilityTime > 0.0f);
 }
 
 void ABaseCharacter::SpawnFireable()
@@ -230,11 +238,6 @@ void ABaseCharacter::UpdateResetDoubleJump()
 void ABaseCharacter::OnHealthDepleted()
 {
 	Destroy();
-}
-
-void ABaseCharacter::UpdateIsExhausted()
-{
-	SetIsExhausted(!IsPlayerControlled() && (CurrentHealth <= (BaseHealth * ExhaustedHealthMultiplierThreshold)));
 }
 
 float ABaseCharacter::GetIncomingDamageMultiplierForColour(EPlayableColours IncomingDamageColour)
@@ -288,4 +291,11 @@ float ABaseCharacter::GetIncomingDamageMultiplierForColour(EPlayableColours Inco
 	}
 
 	return 1.0f;
+}
+
+void ABaseCharacter::UpdateInvincibility(float DeltaSeconds)
+{
+	if (!IsInvincible()) { return; }
+
+	CurrentInvincibilityTime -= DeltaSeconds;
 }
