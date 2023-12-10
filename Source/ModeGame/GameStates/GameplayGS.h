@@ -27,6 +27,9 @@ private:
 	UPROPERTY()
 		float CurrentHealth = 0;
 
+	UPROPERTY()
+		int CurrentScore = 0.0f;
+
 public:
 	AGameplayGS();
 
@@ -44,4 +47,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void OnHealthDepleted();
 
+	UFUNCTION(BlueprintCallable)
+		int GetScore();
+
+	UFUNCTION(BlueprintCallable)
+		void AddScore(int ScoreAmount);
 };

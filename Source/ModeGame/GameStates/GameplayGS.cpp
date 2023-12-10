@@ -41,3 +41,13 @@ void AGameplayGS::OnHealthDepleted()
 {
 	UE_LOG(LogTemp, Warning, TEXT("YOU DIED"));
 }
+
+int AGameplayGS::GetScore()
+{
+	return CurrentScore;
+}
+
+void AGameplayGS::AddScore(int ScoreAmount)
+{
+	CurrentScore += ScoreAmount;
+}

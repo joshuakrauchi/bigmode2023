@@ -8,6 +8,7 @@
 class IFireable;
 class UCameraComponent;
 class USkeletalMeshComponent;
+class UTextRenderComponent;
 
 UCLASS()
 class MODEGAME_API ABaseCharacter : public ACharacter, public IDamageable
@@ -45,6 +46,15 @@ public:
 	UPROPERTY(EditAnywhere)
 		float BaseInvincibilityTime = 0.0f;
 
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<UTextRenderComponent> ScoreTextRenderComponent = nullptr;
+
+	UPROPERTY(EditAnywhere)
+		float ScoreTextRiseSpeed = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float BaseTimeBeforeScoreTextDisappear = 0.0f;
+
 private:
 	UPROPERTY()
 		TObjectPtr<AActor> FireableActor = nullptr;
@@ -63,6 +73,9 @@ private:
 
 	UPROPERTY()
 		float CurrentInvincibilityTime = 0.0f;
+
+	UPROPERTY()
+		float CurrentTimeBeforeScoreTextDisappear = 0.0f;
 
 public:
 	// Sets default values for this character's properties
@@ -137,4 +150,10 @@ private:
 
 	UFUNCTION()
 		void UpdateInvincibility(float DeltaSeconds);
+
+	UFUNCTION()
+		void SetScoreText(int Number, EPlayableColours Colour);
+
+	UFUNCTION()
+		void UpdateScoreText(float DeltaSeconds);
 };

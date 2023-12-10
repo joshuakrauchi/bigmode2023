@@ -26,7 +26,6 @@ ABaseWeapon::ABaseWeapon()
 	ThirdPersonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ThirdPersonMesh->SetCastHiddenShadow(true);
 	ThirdPersonMesh->SetOwnerNoSee(true);
-
 }
 
 // Called when the game starts or when spawned
@@ -96,7 +95,7 @@ bool ABaseWeapon::TryDamageDamageable(TScriptInterface<IDamageable> Damageable, 
 		return false;
 	}
 
-	IDamageable::Execute_OnDamaged(DamageablePawn, BaseDamage * GetFalloffAdjustedDamage(Distance), BaseCharacter->CharacterColour);
+	IDamageable::Execute_OnDamaged(DamageablePawn, GetFalloffAdjustedDamage(Distance), BaseCharacter->CharacterColour);
 
 	return true;
 }

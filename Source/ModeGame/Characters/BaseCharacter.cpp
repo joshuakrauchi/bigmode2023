@@ -3,8 +3,11 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerControllers/GameplayPC.h"
-#include "../GameStates/GameplayGS.h"
+#include "GameStates/GameplayGS.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Text/ScoreNumber.h"
+#include "Components/TextRenderComponent.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -34,6 +37,9 @@ ABaseCharacter::ABaseCharacter()
 	Movement->AirControl = 1.0f;
 	Movement->AirControlBoostMultiplier = 100.0f;
 	Movement->SetWalkableFloorAngle(90.0f);
+
+	ScoreTextRenderComponent = CreateDefaultSubobject<UTextRenderComponent>(FName("ScoreTextRenderComponent"));
+	ScoreTextRenderComponent->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +69,7 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 
 	UpdateResetDoubleJump();
 	UpdateInvincibility(DeltaSeconds);
+	UpdateScoreText(DeltaSeconds);
 }
 
 void ABaseCharacter::PossessedBy(AController* NewController)
@@ -78,20 +85,29 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 
 void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColours SourceColour)
 {
-	if (IsInvincible()) { return; }
-
 	TObjectPtr<UWorld> World = GetWorld();
 	if (!IsValid(World)) { return; }
 
+	TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+	if (!IsValid(GameplayGS)) { return; }
+
 	float TotalDamage = (DamageAmount * GetIncomingDamageMultiplierForColour(SourceColour));
+
+	if (!IsPlayerControlled())
+	{
+		// Add score regardless of invincibility.
+		int ScoreText = FMath::RoundFromZero(TotalDamage);
+
+		SetScoreText(ScoreText, SourceColour);
+		
+		GameplayGS->AddScore(ScoreText);
+	}
+
+	if (IsInvincible()) { return; }
 
 	if (IsPlayerControlled())
 	{
-		TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
-		if (IsValid(GameplayGS))
-		{
-			GameplayGS->DecreaseHealth(DamageAmount);
-		}
+		GameplayGS->DecreaseHealth(DamageAmount);
 	}
 	else
 	{
@@ -298,4 +314,67 @@ void ABaseCharacter::UpdateInvincibility(float DeltaSeconds)
 	if (!IsInvincible()) { return; }
 
 	CurrentInvincibilityTime -= DeltaSeconds;
+}
+
+void ABaseCharacter::UpdateScoreText(float DeltaSeconds)
+{
+	if (!IsValid(ScoreTextRenderComponent)) { return; }
+
+	if (!ScoreTextRenderComponent->IsVisible()) { return; }
+
+	CurrentTimeBeforeScoreTextDisappear -= DeltaSeconds;
+	if (CurrentTimeBeforeScoreTextDisappear <= 0.0f)
+	{
+		ScoreTextRenderComponent->SetVisibility(false);
+	}
+	
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	TObjectPtr<ACharacter> PlayerCharacter = UGameplayStatics::GetPlayerCharacter(World, 0);
+	if (!IsValid(PlayerCharacter)) { return; }
+
+	ScoreTextRenderComponent->AddRelativeLocation(GetActorUpVector() * ScoreTextRiseSpeed * DeltaSeconds);
+	ScoreTextRenderComponent->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(ScoreTextRenderComponent->GetComponentLocation(), PlayerCharacter->GetActorLocation()));
+}
+
+void ABaseCharacter::SetScoreText(int Number, EPlayableColours Colour)
+{
+	if (!IsValid(ScoreTextRenderComponent)) { return; }
+
+	ScoreTextRenderComponent->SetRelativeLocation(UKismetMathLibrary::RandomUnitVector() * 50.0f);
+
+	FColor RenderColor = FColor::White;
+	switch (Colour)
+	{
+	case EPlayableColours::Grey:
+	{
+		RenderColor = FColor(128.0f, 128.0f, 128.0f);
+	}
+	break;
+	case EPlayableColours::Red:
+	{
+		RenderColor = FColor::Red;
+	}
+	break;
+	case EPlayableColours::Green:
+	{
+		RenderColor = FColor::Green;
+	}
+	break;
+	case EPlayableColours::Blue:
+	{
+		RenderColor = FColor::Blue;
+	}
+	break;
+	case EPlayableColours::None:
+	case EPlayableColours::Count:
+	default:
+		break;
+	}
+
+	ScoreTextRenderComponent->SetTextRenderColor(RenderColor);
+	ScoreTextRenderComponent->SetText(FText::FromString(FString::Printf(TEXT("+%d"), Number)));
+	ScoreTextRenderComponent->SetVisibility(true);
+	CurrentTimeBeforeScoreTextDisappear = BaseTimeBeforeScoreTextDisappear;
 }
