@@ -17,18 +17,18 @@ class MODEGAME_API AGameplayGS : public AGameStateBase
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float BaseHealth = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+		float CurrentHealth = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+		int CurrentScore = 0.0f;
 
 private:
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<USpawnManagerComponent> SpawnManagerComponent = nullptr;
-
-	UPROPERTY()
-		float CurrentHealth = 0;
-
-	UPROPERTY()
-		int CurrentScore = 0.0f;
 
 public:
 	AGameplayGS();

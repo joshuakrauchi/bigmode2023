@@ -28,7 +28,7 @@ public:
 	UPROPERTY(EditAnywhere)
 		float BaseHealth = 0;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		EPlayableColours CharacterColour = EPlayableColours::None;
 
 	UPROPERTY(EditAnywhere)

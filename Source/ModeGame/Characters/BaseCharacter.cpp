@@ -203,7 +203,10 @@ FVector ABaseCharacter::GetProjectileStartLocation() const
 
 FVector ABaseCharacter::GetProjectileEndLocation(float Range, float ScatterRange) const
 {
-	FVector Movement = UKismetMathLibrary::GetForwardVector(GetControlRotation());
+	TObjectPtr<UCameraComponent> Camera = GetFirstPersonCamera();
+	if (!IsValid(Camera)) { return FVector::Zero(); }
+
+	FVector Movement = Camera->GetForwardVector();
 
 	if (ScatterRange > 0.0f)
 	{
@@ -212,7 +215,7 @@ FVector ABaseCharacter::GetProjectileEndLocation(float Range, float ScatterRange
 		Movement = RandomRotation.RotateVector(Movement);
 	}
 
-	return ((Movement * Range) + GetActorLocation());
+	return ((Movement * Range) + Camera->GetComponentLocation());
 }
 
 bool ABaseCharacter::IsInvincible() const

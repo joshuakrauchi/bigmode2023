@@ -44,9 +44,15 @@ private:
 	UPROPERTY()
 		FVector2D MoveInput = FVector2D::Zero();
 
+	UPROPERTY()
+		bool bIsCameraRotationDisabled = false;
+
 public:
 	UFUNCTION(BlueprintCallable)
 		FVector2D GetMoveInput() const;
+
+	UFUNCTION(BlueprintCallable)
+		void SetCameraRotationEnabled(bool bEnabled);
 
 protected:
 	virtual void BeginPlay() override;
@@ -64,24 +70,24 @@ private:
 		void OnMoveCompleted(const FInputActionValue& Value);
 
 	UFUNCTION()
-		void OnFireTriggered(const FInputActionValue& Value);
+		void OnFireStarted(const FInputActionValue& Value);
 
 	UFUNCTION()
 		void OnFireCompleted(const FInputActionValue& Value);
 
 	UFUNCTION()
-		void OnGrappleTriggered(const FInputActionValue& Value);
+		void OnGrappleStarted(const FInputActionValue& Value);
 
 	UFUNCTION()
 		void OnGrappleCompleted(const FInputActionValue& Value);
 
 	UFUNCTION()
-		void OnJumpTriggered(const FInputActionValue& Value);
+		void OnJumpStarted(const FInputActionValue& Value);
 
 	UFUNCTION()
 		void OnJumpCompleted(const FInputActionValue& Value);
 
 	UFUNCTION()
-		void OnMeleeTriggered(const FInputActionValue& Value);
+		void OnMeleeStarted(const FInputActionValue& Value);
 
 };

@@ -16,6 +16,11 @@ FVector2D AGameplayPC::GetMoveInput() const
 	return MoveInput;
 }
 
+void AGameplayPC::SetCameraRotationEnabled(bool bEnabled)
+{
+	bIsCameraRotationDisabled = !bEnabled;
+}
+
 void AGameplayPC::BeginPlay()
 {
 	Super::BeginPlay();
@@ -35,18 +40,20 @@ void AGameplayPC::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnLookTriggered);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGameplayPC::OnMoveTriggered);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AGameplayPC::OnMoveTriggered);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AGameplayPC::OnFireTriggered);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AGameplayPC::OnMoveCompleted);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AGameplayPC::OnFireStarted);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AGameplayPC::OnFireCompleted);
-	EnhancedInputComponent->BindAction(GrappleAction, ETriggerEvent::Started, this, &AGameplayPC::OnGrappleTriggered);
+	EnhancedInputComponent->BindAction(GrappleAction, ETriggerEvent::Started, this, &AGameplayPC::OnGrappleStarted);
 	EnhancedInputComponent->BindAction(GrappleAction, ETriggerEvent::Completed, this, &AGameplayPC::OnGrappleCompleted);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AGameplayPC::OnJumpTriggered);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AGameplayPC::OnJumpStarted);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGameplayPC::OnJumpCompleted);
-	EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AGameplayPC::OnMeleeTriggered);
+	EnhancedInputComponent->BindAction(MeleeAction, ETriggerEvent::Started, this, &AGameplayPC::OnMeleeStarted);
 }
 
 void AGameplayPC::OnLookTriggered(const FInputActionValue& Value)
 {
+	if (bIsCameraRotationDisabled) { return; }
+
 	FVector2D LookVector = Value.Get<FVector2D>();
 	
 	AddYawInput(LookVector.X);
@@ -73,7 +80,7 @@ void AGameplayPC::OnMoveCompleted(const FInputActionValue& Value)
 	MoveInput = MoveVector;
 }
 
-void AGameplayPC::OnFireTriggered(const FInputActionValue& Value)
+void AGameplayPC::OnFireStarted(const FInputActionValue& Value)
 {
 	TObjectPtr<ABaseCharacter> BaseCharacter = GetPawn<ABaseCharacter>();
 	if (!IsValid(BaseCharacter)) { return; }
@@ -95,7 +102,7 @@ void AGameplayPC::OnFireCompleted(const FInputActionValue& Value)
 	Fireable->TryEndFire();
 }
 
-void AGameplayPC::OnGrappleTriggered(const FInputActionValue& Value)
+void AGameplayPC::OnGrappleStarted(const FInputActionValue& Value)
 {
 
 }
@@ -105,7 +112,7 @@ void AGameplayPC::OnGrappleCompleted(const FInputActionValue& Value)
 
 }
 
-void AGameplayPC::OnJumpTriggered(const FInputActionValue& Value)
+void AGameplayPC::OnJumpStarted(const FInputActionValue& Value)
 {
 	TObjectPtr<ABaseCharacter> PossessedCharacter = GetPawn<ABaseCharacter>();
 	if (!IsValid(PossessedCharacter)) { return; }
@@ -129,7 +136,7 @@ void AGameplayPC::OnJumpCompleted(const FInputActionValue& Value)
 	PossessedCharacter->StopJumping();
 }
 
-void AGameplayPC::OnMeleeTriggered(const FInputActionValue& Value)
+void AGameplayPC::OnMeleeStarted(const FInputActionValue& Value)
 {
 
 }
