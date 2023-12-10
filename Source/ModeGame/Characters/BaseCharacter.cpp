@@ -157,7 +157,10 @@ void ABaseCharacter::ResetDoubleJump()
 
 bool ABaseCharacter::CanDoubleJump() const
 {
-	return bCanJumpAgain;
+	TObjectPtr<UCharacterMovementComponent> Movement = GetCharacterMovement();
+	if (!IsValid(Movement)) { return false; }
+
+  	return (bCanJumpAgain && !Movement->IsFlying());
 }
 
 void ABaseCharacter::DoubleJump()
@@ -247,7 +250,7 @@ void ABaseCharacter::UpdateResetDoubleJump()
 	TObjectPtr<UCharacterMovementComponent> Movement = GetCharacterMovement();
 	if (!IsValid(Movement)) { return; }
 
-	if (!Movement->IsFalling())
+	if (Movement->IsFlying() || !Movement->IsFalling())
 	{
 		ResetDoubleJump();
 	}
