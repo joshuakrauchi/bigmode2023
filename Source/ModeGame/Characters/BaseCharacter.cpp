@@ -6,7 +6,6 @@
 #include "GameStates/GameplayGS.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "Text/ScoreNumber.h"
 #include "Components/TextRenderComponent.h"
 
 ABaseCharacter::ABaseCharacter()
