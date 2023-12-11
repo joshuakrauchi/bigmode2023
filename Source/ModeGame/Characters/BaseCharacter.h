@@ -55,6 +55,9 @@ public:
 	UPROPERTY(EditAnywhere)
 		float BaseTimeBeforeScoreTextDisappear = 0.0f;
 
+	UPROPERTY(EditAnywhere)
+		TObjectPtr<UClass> CharacterToSpawnOnDeath = nullptr;
+
 private:
 	UPROPERTY()
 		TObjectPtr<AActor> FireableActor = nullptr;
@@ -156,4 +159,7 @@ private:
 
 	UFUNCTION()
 		void UpdateScoreText(float DeltaSeconds);
+
+	UFUNCTION()
+		void SpawnExplodingDeathCharacter();
 };

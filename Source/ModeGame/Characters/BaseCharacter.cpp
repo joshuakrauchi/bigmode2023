@@ -7,6 +7,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextRenderComponent.h"
+#include "Characters/ExplodingDeathCharacter.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -258,6 +259,8 @@ void ABaseCharacter::UpdateResetDoubleJump()
 
 void ABaseCharacter::OnHealthDepleted()
 {
+	SpawnExplodingDeathCharacter();
+
 	Destroy();
 }
 
@@ -341,6 +344,20 @@ void ABaseCharacter::UpdateScoreText(float DeltaSeconds)
 
 	ScoreTextRenderComponent->AddRelativeLocation(GetActorUpVector() * ScoreTextRiseSpeed * DeltaSeconds);
 	ScoreTextRenderComponent->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(ScoreTextRenderComponent->GetComponentLocation(), PlayerCharacter->GetActorLocation()));
+}
+
+void ABaseCharacter::SpawnExplodingDeathCharacter()
+{
+	if (!IsValid(CharacterToSpawnOnDeath)) { return; }
+
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+	
+	TObjectPtr<USkeletalMeshComponent> TPMesh = GetMesh();
+	if (!IsValid(TPMesh)) { return; }
+	
+	TObjectPtr<AExplodingDeathCharacter> ExplodingDeathCharacter = World->SpawnActor<AExplodingDeathCharacter>(CharacterToSpawnOnDeath, TPMesh->GetComponentLocation(), GetActorRotation());
+	ExplodingDeathCharacter->ApplyMaterial(TPMesh->GetMaterial(0));
 }
 
 void ABaseCharacter::SetScoreText(int Number, EPlayableColours Colour)
