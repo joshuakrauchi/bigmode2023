@@ -138,6 +138,15 @@ public:
 	UFUNCTION()
 		bool IsInvincible() const;
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayDamagedPlayerSFX();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayDamagedAISFX();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayDoubleJumpSFX();
+
 private:
 	UFUNCTION()
 		void SpawnFireable();
@@ -162,4 +171,5 @@ private:
 
 	UFUNCTION()
 		void SpawnExplodingDeathCharacter();
+
 };

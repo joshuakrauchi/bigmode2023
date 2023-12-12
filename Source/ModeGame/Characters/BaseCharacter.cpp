@@ -101,6 +101,8 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColou
 		SetScoreText(ScoreText, SourceColour);
 		
 		GameplayGS->AddScore(ScoreText);
+
+		PlayDamagedAISFX();
 	}
 
 	if (IsInvincible()) { return; }
@@ -108,6 +110,8 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColou
 	if (IsPlayerControlled())
 	{
 		GameplayGS->DecreaseHealth(DamageAmount);
+
+		PlayDamagedPlayerSFX();
 	}
 	else
 	{
@@ -166,6 +170,8 @@ bool ABaseCharacter::CanDoubleJump() const
 
 void ABaseCharacter::DoubleJump()
 {
+	PlayDoubleJumpSFX();
+
 	TObjectPtr<AGameplayPC> GameplayPC = GetController<AGameplayPC>();
 	if (!IsValid(GameplayPC)) { return; }
 
