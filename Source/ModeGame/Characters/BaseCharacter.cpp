@@ -92,6 +92,7 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColou
 	if (!IsValid(GameplayGS)) { return; }
 
 	float TotalDamage = (DamageAmount * GetIncomingDamageMultiplierForColour(SourceColour));
+	if (TotalDamage <= 0.0f) { return; }
 
 	if (!IsPlayerControlled())
 	{

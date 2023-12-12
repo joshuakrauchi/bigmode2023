@@ -24,7 +24,7 @@ public:
 		float CurrentHealth = 0;
 
 	UPROPERTY(BlueprintReadOnly)
-		int CurrentScore = 0.0f;
+		int64 CurrentScore = 0.0f;
 
 private:
 	UPROPERTY(VisibleAnywhere)
