@@ -49,5 +49,7 @@ int AGameplayGS::GetScore()
 
 void AGameplayGS::AddScore(int ScoreAmount)
 {
+	if (ScoreAmount <= 0) { return; }
+
 	CurrentScore += ScoreAmount;
 }
