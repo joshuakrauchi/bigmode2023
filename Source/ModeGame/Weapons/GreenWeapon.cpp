@@ -69,8 +69,7 @@ bool AGreenWeapon::TryBeginFire()
 
 		SpawnBulletTrail(Trace.ImpactPoint);
 
-		TScriptInterface<IDamageable> Damageable = nullptr;
-		Damageable.SetInterface(Cast<IDamageable>(Trace.GetActor()));
+		TScriptInterface<IDamageable> Damageable = Trace.GetActor();
 		if (Damageable != nullptr)
 		{
 			TryDamageDamageable(Damageable, Trace.Distance);
