@@ -21,6 +21,16 @@ void AGameplayPC::SetCameraRotationEnabled(bool bEnabled)
 	bIsCameraRotationDisabled = !bEnabled;
 }
 
+float AGameplayPC::GetCameraSensitivity() const
+{
+	return CameraSensitivity;
+}
+
+void AGameplayPC::SetCameraSensitivity(float Sensitivity)
+{
+	CameraSensitivity = Sensitivity;
+}
+
 void AGameplayPC::BeginPlay()
 {
 	Super::BeginPlay();
@@ -56,8 +66,8 @@ void AGameplayPC::OnLookTriggered(const FInputActionValue& Value)
 
 	FVector2D LookVector = Value.Get<FVector2D>();
 	
-	AddYawInput(LookVector.X);
-	AddPitchInput(LookVector.Y);
+	AddYawInput(LookVector.X * CameraSensitivity);
+	AddPitchInput(LookVector.Y * CameraSensitivity);
 }
 
 void AGameplayPC::OnMoveTriggered(const FInputActionValue& Value)
