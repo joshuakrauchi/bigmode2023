@@ -39,6 +39,9 @@ public:
 
 	UFUNCTION()
 		float GetSecondsSinceLastSpawn() const;
+
+	UFUNCTION(BlueprintCallable)
+		UCapsuleComponent* GetCapsule() const;
 		
 private:
 	UFUNCTION()

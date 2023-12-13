@@ -164,6 +164,9 @@ public:
 	UFUNCTION()
 		FLinearColor GetColorFromCollection() const;
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void UpdateMoveToSafeSpawner(float DeltaSeconds);
+
 private:
 	UFUNCTION()
 		void SpawnFireable();

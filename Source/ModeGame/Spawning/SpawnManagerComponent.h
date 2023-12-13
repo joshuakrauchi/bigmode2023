@@ -63,6 +63,9 @@ public:
 	UFUNCTION()
 		ASpawner* DetermineBestSpawner();
 
+	UFUNCTION(BlueprintCallable)
+		ASpawner* GetClosestSpawnerToLocation(FVector Location) const;
+
 private:
 	bool TrySpawnActor(UClass* ActorClass, AActor*& OutSpawnedActor);
 

@@ -71,6 +71,7 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 	UpdateResetDoubleJump();
 	UpdateInvincibility(DeltaSeconds);
 	UpdateScoreText(DeltaSeconds);
+	UpdateMoveToSafeSpawner(DeltaSeconds);
 }
 
 void ABaseCharacter::PossessedBy(AController* NewController)

@@ -60,6 +60,11 @@ float ASpawner::GetSecondsSinceLastSpawn() const
 	return (UGameplayStatics::GetTimeSeconds(GetWorld()) - TimeAtLastSpawn);
 }
 
+UCapsuleComponent* ASpawner::GetCapsule() const
+{
+	return SpawnCapsule;
+}
+
 bool ASpawner::TryRegisterWithSpawnManager()
 {
 	TObjectPtr<UWorld> World = GetWorld();
