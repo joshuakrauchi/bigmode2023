@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextRenderComponent.h"
 #include "Characters/ExplodingDeathCharacter.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -98,6 +99,7 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColou
 	{
 		// Add score regardless of invincibility.
 		int ScoreText = FMath::RoundFromZero(TotalDamage);
+		if (ScoreText <= 0.0f) { return; }
 
 		SetScoreText(ScoreText, SourceColour);
 		
@@ -127,6 +129,10 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColou
 		else if (CurrentHealth <= 0.0f)
 		{
 			OnHealthDepleted();
+		}
+		else if (!IsExhausted())
+		{
+			PlayDamagedMontage();
 		}
 	}
 }
@@ -208,7 +214,7 @@ FVector ABaseCharacter::GetProjectileStartLocation() const
 	TObjectPtr<UCameraComponent> Camera = GetFirstPersonCamera();
 	if (!IsValid(Camera)) { return FVector::Zero(); }
 
-	return (Camera->GetForwardVector() + Camera->GetComponentLocation());
+	return (Camera->GetComponentLocation() + GetControlRotation().Vector());
 }
 
 FVector ABaseCharacter::GetProjectileEndLocation(float Range, float ScatterRange) const
@@ -216,7 +222,7 @@ FVector ABaseCharacter::GetProjectileEndLocation(float Range, float ScatterRange
 	TObjectPtr<UCameraComponent> Camera = GetFirstPersonCamera();
 	if (!IsValid(Camera)) { return FVector::Zero(); }
 
-	FVector Movement = Camera->GetForwardVector();
+	FVector Movement = GetControlRotation().Vector();
 
 	if (ScatterRange > 0.0f)
 	{
@@ -231,6 +237,54 @@ FVector ABaseCharacter::GetProjectileEndLocation(float Range, float ScatterRange
 bool ABaseCharacter::IsInvincible() const
 {
 	return (CurrentInvincibilityTime > 0.0f);
+}
+
+bool ABaseCharacter::IsPlayingDamagedMontage() const
+{
+	return bIsPlayingDamagedMontage;
+}
+
+FLinearColor ABaseCharacter::GetColorFromCollection() const
+{
+	FLinearColor Color = FLinearColor::White;
+
+	if (!IsValid(GameColors)) { return Color; }
+
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return Color; }
+
+	TObjectPtr<UMaterialParameterCollectionInstance> GameColorsInstance = World->GetParameterCollectionInstance(GameColors);
+	if (!IsValid(GameColorsInstance)) { return Color; }
+
+	switch (CharacterColour)
+	{
+	case EPlayableColours::Grey:
+	{
+		GameColorsInstance->GetVectorParameterValue(FName("RedColor"), Color);
+	}
+	break;
+	case EPlayableColours::Red:
+	{
+		GameColorsInstance->GetVectorParameterValue(FName("RedColor"), Color);
+	}
+	break;
+	case EPlayableColours::Green:
+	{
+		GameColorsInstance->GetVectorParameterValue(FName("GreenColor"), Color);
+	}
+	break;
+	case EPlayableColours::Blue:
+	{
+		GameColorsInstance->GetVectorParameterValue(FName("BlueColor"), Color);
+	}
+	break;
+	case EPlayableColours::None:
+	case EPlayableColours::Count:
+	default:
+		break;
+	}
+
+	return Color;
 }
 
 void ABaseCharacter::SpawnFireable()
@@ -364,7 +418,7 @@ void ABaseCharacter::SpawnExplodingDeathCharacter()
 	if (!IsValid(TPMesh)) { return; }
 	
 	TObjectPtr<AExplodingDeathCharacter> ExplodingDeathCharacter = World->SpawnActor<AExplodingDeathCharacter>(CharacterToSpawnOnDeath, TPMesh->GetComponentLocation(), GetActorRotation());
-	ExplodingDeathCharacter->ApplyMaterial(TPMesh->GetMaterial(0));
+	ExplodingDeathCharacter->ApplyMaterial(TPMesh->GetMaterial(0), GetColorFromCollection());
 }
 
 void ABaseCharacter::SetScoreText(int Number, EPlayableColours Colour)
@@ -373,36 +427,9 @@ void ABaseCharacter::SetScoreText(int Number, EPlayableColours Colour)
 
 	ScoreTextRenderComponent->SetRelativeLocation(UKismetMathLibrary::RandomUnitVector() * 50.0f);
 
-	FColor RenderColor = FColor::White;
-	switch (Colour)
-	{
-	case EPlayableColours::Grey:
-	{
-		RenderColor = FColor(128.0f, 128.0f, 128.0f);
-	}
-	break;
-	case EPlayableColours::Red:
-	{
-		RenderColor = FColor::Red;
-	}
-	break;
-	case EPlayableColours::Green:
-	{
-		RenderColor = FColor::Green;
-	}
-	break;
-	case EPlayableColours::Blue:
-	{
-		RenderColor = FColor::Blue;
-	}
-	break;
-	case EPlayableColours::None:
-	case EPlayableColours::Count:
-	default:
-		break;
-	}
+	FLinearColor RenderColor = GetColorFromCollection();
 
-	ScoreTextRenderComponent->SetTextRenderColor(RenderColor);
+	ScoreTextRenderComponent->SetTextRenderColor(RenderColor.ToFColor(true));
 	ScoreTextRenderComponent->SetText(FText::FromString(FString::Printf(TEXT("+%d"), Number)));
 	ScoreTextRenderComponent->SetVisibility(true);
 	CurrentTimeBeforeScoreTextDisappear = BaseTimeBeforeScoreTextDisappear;

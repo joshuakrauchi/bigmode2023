@@ -31,7 +31,6 @@ void AExplodingDeathCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	if (!IsValid(FieldSystemComponent)) { return; }
-
 	if (!IsValid(Collision)) { return; }
 
 	TObjectPtr<URadialFalloff> ExternalStrain = RadialFalloff->SetRadialFalloff(10000.0f, 0.0f, 1.0f, 0.0f, Collision->GetScaledSphereRadius(), Collision->GetComponentLocation(), EFieldFalloffType::Field_FallOff_None);
@@ -40,7 +39,12 @@ void AExplodingDeathCharacter::BeginPlay()
 	FieldSystemComponent->ApplyPhysicsField(true, EFieldPhysicsType::Field_LinearVelocity, nullptr, LinearVelocity);
 }
 
-void AExplodingDeathCharacter::ApplyMaterial(TObjectPtr<UMaterialInterface> Material)
+void AExplodingDeathCharacter::ApplyMaterial(TObjectPtr<UMaterialInterface> Material, FLinearColor ParticleColor)
 {
+	if (!IsValid(GeometryCollectionComponent)) { return; }
+	if (!IsValid(ExplosionParticleComponent)) { return; }
+
 	GeometryCollectionComponent->SetMaterial(0, Material);
+
+	ExplosionParticleComponent->SetVectorParameter(FName("Scale RGB"), FVector(ParticleColor.R, ParticleColor.G, ParticleColor.B));
 }

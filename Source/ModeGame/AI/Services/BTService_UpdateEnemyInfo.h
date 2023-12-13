@@ -28,6 +28,12 @@ public:
 	UPROPERTY(EditAnywhere)
 		FBlackboardKeySelector OutIsExhausted;
 
+	UPROPERTY(EditAnywhere)
+		FBlackboardKeySelector OutHasLOSToPlayer;
+
+	UPROPERTY(EditAnywhere)
+		FBlackboardKeySelector OutIsPlayingDamagedMontage;
+
 public:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 

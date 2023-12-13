@@ -2,7 +2,7 @@
 
 
 #include "Spawning/SpawnManagerComponent.h"
-#include "SpawnerComponent.h"
+#include "Spawning/Spawner.h"
 
 // Sets default values for this component's properties
 USpawnManagerComponent::USpawnManagerComponent()
@@ -48,38 +48,38 @@ void USpawnManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 }
 
-void USpawnManagerComponent::RegisterSpawnerComponent(USpawnerComponent* SpawnerComponent)
+void USpawnManagerComponent::RegisterSpawner(ASpawner* Spawner)
 {
-	SpawnerComponents.Add(SpawnerComponent);
+	Spawners.Add(Spawner);
 }
 
-USpawnerComponent* USpawnManagerComponent::DetermineBestSpawnerComponent()
+ASpawner* USpawnManagerComponent::DetermineBestSpawner()
 {
-	if (SpawnerComponents.Num() <= 0) { return nullptr; }
+	if (Spawners.Num() <= 0) { return nullptr; }
 
-	TObjectPtr<USpawnerComponent> LeastRecentlyUsedSpawnComponent = nullptr;
+	TObjectPtr<ASpawner> LeastRecentlyUsedSpawner = nullptr;
 	float SecondsSinceLastSpawn = 0.0f;
 
-	for (const TObjectPtr<USpawnerComponent> SpawnerComponent : SpawnerComponents)
+	for (const TObjectPtr<ASpawner> Spawner : Spawners)
 	{
-		if (!IsValid(SpawnerComponent)) { continue; }
-		float CurrentSeconds = SpawnerComponent->GetSecondsSinceLastSpawn();
+		if (!IsValid(Spawner)) { continue; }
+		float CurrentSeconds = Spawner->GetSecondsSinceLastSpawn();
 		if (CurrentSeconds > SecondsSinceLastSpawn)
 		{
-			LeastRecentlyUsedSpawnComponent = SpawnerComponent;
+			LeastRecentlyUsedSpawner = Spawner;
 			SecondsSinceLastSpawn = CurrentSeconds;
 		}
 	}
 
-	return LeastRecentlyUsedSpawnComponent;
+	return LeastRecentlyUsedSpawner;
 }
 
 bool USpawnManagerComponent::TrySpawnActor(UClass* ActorClass, AActor*& OutSpawnedActor)
 {
-	TObjectPtr<USpawnerComponent> BestSpawnerComponent = DetermineBestSpawnerComponent();
-	if (!IsValid(BestSpawnerComponent)) { return false; }
+	TObjectPtr<ASpawner> BestSpawner = DetermineBestSpawner();
+	if (!IsValid(BestSpawner)) { return false; }
 
-	bool bSpawnSucceeded = BestSpawnerComponent->TrySpawnActor(ActorClass, OutSpawnedActor);
+	bool bSpawnSucceeded = BestSpawner->TrySpawnActor(ActorClass, OutSpawnedActor);
 
 	return bSpawnSucceeded;
 }

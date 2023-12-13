@@ -20,12 +20,14 @@ ABaseWeapon::ABaseWeapon()
 	FirstPersonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FirstPersonMesh->SetCastShadow(false);
 	FirstPersonMesh->SetOnlyOwnerSee(true);
+	FirstPersonMesh->SetReceivesDecals(false);
 
 	ThirdPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("ThirdPersonMesh"));
 	ThirdPersonMesh->SetupAttachment(GetRootComponent());
 	ThirdPersonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ThirdPersonMesh->SetCastHiddenShadow(true);
 	ThirdPersonMesh->SetOwnerNoSee(true);
+	ThirdPersonMesh->SetReceivesDecals(false);
 }
 
 // Called when the game starts or when spawned

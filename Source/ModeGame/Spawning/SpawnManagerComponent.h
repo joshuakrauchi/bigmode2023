@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SpawnManagerComponent.generated.h"
 
-class USpawnerComponent;
+class ASpawner;
 
 USTRUCT()
 struct FSpawnInfo
@@ -43,7 +43,7 @@ private:
 		TMap<TObjectPtr<UClass>, float> TimeBeforeSpawnByClass;
 
 	UPROPERTY()
-		TArray<TObjectPtr<USpawnerComponent>> SpawnerComponents;
+		TArray<TObjectPtr<ASpawner>> Spawners;
 
 public:
 	// Sets default values for this component's properties
@@ -58,10 +58,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-		void RegisterSpawnerComponent(USpawnerComponent* SpawnerComponent);
+		void RegisterSpawner(ASpawner* Spawner);
 
 	UFUNCTION()
-		USpawnerComponent* DetermineBestSpawnerComponent();
+		ASpawner* DetermineBestSpawner();
 
 private:
 	bool TrySpawnActor(UClass* ActorClass, AActor*& OutSpawnedActor);

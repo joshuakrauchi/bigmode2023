@@ -47,12 +47,21 @@ private:
 	UPROPERTY()
 		bool bIsCameraRotationDisabled = false;
 
+	UPROPERTY()
+		float CameraSensitivity = 1.0f;
+
 public:
 	UFUNCTION(BlueprintCallable)
 		FVector2D GetMoveInput() const;
 
 	UFUNCTION(BlueprintCallable)
 		void SetCameraRotationEnabled(bool bEnabled);
+
+	UFUNCTION(BlueprintCallable)
+		float GetCameraSensitivity() const;
+
+	UFUNCTION(BlueprintCallable)
+		void SetCameraSensitivity(float Sensitivity);
 
 protected:
 	virtual void BeginPlay() override;
