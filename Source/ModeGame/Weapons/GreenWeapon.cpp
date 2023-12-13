@@ -57,13 +57,15 @@ bool AGreenWeapon::TryBeginFire()
 	// Finds hits
 	for (int i = 0; i < MaxPellets; ++i)
 	{
-		FVector RandomSpread{ FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians), FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians), FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians) };
+		FVector RandomSpread{ FMath::Tan(FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians)), 
+							  FMath::Tan(FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians)), 
+							  FMath::Tan(FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians)) };
 		FVector AdjustedForward = (ParentForward + RandomSpread) * MaxRange;
 
 		World->LineTraceSingleByChannel(Trace, TraceStart, ParentLocation + AdjustedForward, ECollisionChannel::ECC_Visibility, CollisionParams);
 		if (!Trace.IsValidBlockingHit())
 		{
-			SpawnBulletTrail(AdjustedForward);
+			SpawnBulletTrail(ParentLocation + AdjustedForward);
 			continue;
 		}
 
@@ -83,9 +85,6 @@ bool AGreenWeapon::TryBeginFire()
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, ImpactSparksSystem, Trace.ImpactPoint);
 			}
 		}
-
-		// Visual debug component
-		//DrawDebugLine(World, ParentLocation, ParentLocation + AdjustedForward, { 255, 0, 0 }, false, 3.0f, 0U, 0.2f);
 	}
 
 	PlayFiringMontage();
