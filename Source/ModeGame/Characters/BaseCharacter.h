@@ -3,12 +3,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/Damageable.h"
+#include "Materials/MaterialParameterCollection.h"
 #include "BaseCharacter.generated.h"
 
 class IFireable;
 class UCameraComponent;
 class USkeletalMeshComponent;
 class UTextRenderComponent;
+class UMaterialParameterCollection;
 
 UCLASS()
 class MODEGAME_API ABaseCharacter : public ACharacter, public IDamageable
@@ -57,6 +59,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		TObjectPtr<UClass> CharacterToSpawnOnDeath = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+		bool bIsPlayingDamagedMontage = false;
+
+	UPROPERTY(EditAnywhere)
+		TObjectPtr<UMaterialParameterCollection> GameColors = nullptr;
 
 private:
 	UPROPERTY()
@@ -146,6 +154,15 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void PlayDoubleJumpSFX();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayDamagedMontage();
+
+	UFUNCTION()
+		bool IsPlayingDamagedMontage() const;
+
+	UFUNCTION()
+		FLinearColor GetColorFromCollection() const;
 
 private:
 	UFUNCTION()

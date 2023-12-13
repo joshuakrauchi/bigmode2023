@@ -48,6 +48,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void ApplyMaterial(TObjectPtr<UMaterialInterface> Material);
+	void ApplyMaterial(TObjectPtr<UMaterialInterface> Material, FLinearColor ParticleColor);
 
 };
