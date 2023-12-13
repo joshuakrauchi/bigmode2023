@@ -3,12 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SceneComponent.h"
-#include "SpawnerComponent.generated.h"
+#include "GameFramework/Actor.h"
+#include "Spawner.generated.h"
+
+class UCapsuleComponent;
+class UNiagaraComponent;
 
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class MODEGAME_API USpawnerComponent : public USceneComponent
+UCLASS()
+class MODEGAME_API ASpawner : public AActor
 {
 	GENERATED_BODY()
 
@@ -16,9 +19,15 @@ private:
 	UPROPERTY()
 		float TimeAtLastSpawn = 0.0f;
 
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<UCapsuleComponent> SpawnCapsule = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+		TObjectPtr<UNiagaraComponent> SpawnParticleComponent = nullptr;
+
 public:
 	// Sets default values for this component's properties
-	USpawnerComponent();
+	ASpawner();
 
 protected:
 	// Called when the game starts
