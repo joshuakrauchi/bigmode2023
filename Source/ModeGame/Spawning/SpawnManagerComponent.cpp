@@ -3,6 +3,7 @@
 
 #include "Spawning/SpawnManagerComponent.h"
 #include "Spawning/Spawner.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values for this component's properties
 USpawnManagerComponent::USpawnManagerComponent()
@@ -72,6 +73,29 @@ ASpawner* USpawnManagerComponent::DetermineBestSpawner()
 	}
 
 	return LeastRecentlyUsedSpawner;
+}
+
+ASpawner* USpawnManagerComponent::GetClosestSpawnerToLocation(FVector Location) const
+{
+	TObjectPtr<ASpawner> ClosestSpawner = nullptr;
+	float ClosestDistance = TNumericLimits<float>::Max();
+
+	for (TObjectPtr<ASpawner> Spawner : Spawners)
+	{
+		if (!IsValid(Spawner)) { continue; }
+
+		TObjectPtr<UCapsuleComponent> Capsule = Spawner->GetCapsule();
+		if (!IsValid(Capsule)) { continue; }
+		
+		float CurrentDistance = FVector::DistSquared(Location, Capsule->GetComponentLocation());
+		if (CurrentDistance <= ClosestDistance)
+		{
+			ClosestDistance = CurrentDistance;
+			ClosestSpawner = Spawner;
+		}
+	}
+
+	return ClosestSpawner;
 }
 
 bool USpawnManagerComponent::TrySpawnActor(UClass* ActorClass, AActor*& OutSpawnedActor)

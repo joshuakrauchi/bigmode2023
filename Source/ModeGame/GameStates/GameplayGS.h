@@ -35,7 +35,7 @@ public:
 
 	virtual void BeginPlay();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		USpawnManagerComponent* GetSpawnManager() const;
 
 	UFUNCTION(BlueprintCallable)
