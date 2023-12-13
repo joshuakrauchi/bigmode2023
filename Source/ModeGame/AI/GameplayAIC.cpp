@@ -38,7 +38,7 @@ void AGameplayAIC::Tick(float DeltaTime)
 	TObjectPtr<ACharacter> PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (!IsValid(PlayerCharacter)) { return; }
 
-	if (AIPawn->GetCharacterMovement()->IsFalling())
+	/*if (AIPawn->GetCharacterMovement()->IsFalling())
 	{
 		FVector v = (GetBlackboardComponent()->GetValueAsVector(FName("MoveLocation")) - AIPawn->GetActorLocation());
 		v = v.GetClampedToMaxSize(200);
@@ -46,7 +46,7 @@ void AGameplayAIC::Tick(float DeltaTime)
 		v.Z = AIPawn->GetCharacterMovement()->Velocity.Z;
 
 		AIPawn->GetCharacterMovement()->Velocity = (v);
-	}
+	}*/
 
 
 
