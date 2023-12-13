@@ -58,6 +58,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn /* = true */) override;
+
 	void ResetInitialFiringRotation();
 
 	void SetAIMode(EAIMode NewAIMode);

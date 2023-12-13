@@ -14,6 +14,8 @@
 AGameplayAIC::AGameplayAIC()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	bSetControlRotationFromPawnOrientation = false;
 }
 
 void AGameplayAIC::BeginPlay()
@@ -38,33 +40,48 @@ void AGameplayAIC::Tick(float DeltaTime)
 	TObjectPtr<ACharacter> PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (!IsValid(PlayerCharacter)) { return; }
 
-	/*if (AIPawn->GetCharacterMovement()->IsFalling())
-	{
-		FVector v = (GetBlackboardComponent()->GetValueAsVector(FName("MoveLocation")) - AIPawn->GetActorLocation());
-		v = v.GetClampedToMaxSize(200);
-		v *= 300 * DeltaTime;
-		v.Z = AIPawn->GetCharacterMovement()->Velocity.Z;
-
-		AIPawn->GetCharacterMovement()->Velocity = (v);
-	}*/
-
-
-
-	/*FHitResult OutResult;
-	FVector End = (AIPawn->GetActorLocation()) + AIPawn->GetActorForwardVector() * 100.0f;
-	GetWorld()->LineTraceSingleByChannel(OutResult, AIPawn->GetActorLocation(), End, ECC_Visibility);
-
-	if (OutResult.bBlockingHit)
-	{
-		if (AIPawn->CanJump())
-		{
-			AIPawn->Jump();
-		}
-	}*/
-
 	UpdateFiringRotation(DeltaTime);
 	UpdateFocus();
 	UpdateFiring();
+}
+
+void AGameplayAIC::UpdateControlRotation(float DeltaTime, bool bUpdatePawn /* = true */)
+{
+	// Copied from AAIController except commented some code that prevented pitch from being affected.
+	APawn* const MyPawn = GetPawn();
+	if (MyPawn)
+	{
+		FRotator NewControlRotation = GetControlRotation();
+
+		// Look toward focus
+		const FVector FocalPoint = GetFocalPoint();
+		if (FAISystem::IsValidLocation(FocalPoint))
+		{
+			NewControlRotation = (FocalPoint - MyPawn->GetPawnViewLocation()).Rotation();
+		}
+		else if (bSetControlRotationFromPawnOrientation)
+		{
+			NewControlRotation = MyPawn->GetActorRotation();
+		}
+
+		// Don't pitch view unless looking at another pawn
+		/*if (NewControlRotation.Pitch != 0 && Cast<APawn>(GetFocusActor()) == nullptr)
+		{
+			NewControlRotation.Pitch = 0.f;
+		}*/
+
+		SetControlRotation(NewControlRotation);
+
+		if (bUpdatePawn)
+		{
+			const FRotator CurrentPawnRotation = MyPawn->GetActorRotation();
+
+			if (CurrentPawnRotation.Equals(NewControlRotation, 1e-3f) == false)
+			{
+				MyPawn->FaceRotation(NewControlRotation, DeltaTime);
+			}
+		}
+	}
 }
 
 void AGameplayAIC::UpdateFocus()
@@ -74,8 +91,8 @@ void AGameplayAIC::UpdateFocus()
 
 	if (AIMode != EAIMode::Firing) { return; }
 
-	PossessedPawn->SetActorRotation(FRotator(0.0f, CurrentFiringRotation.Yaw, 0.0f));
 	SetControlRotation(CurrentFiringRotation);
+	
 }
 
 void AGameplayAIC::UpdateFiringRotation(float DeltaSeconds)
@@ -87,13 +104,8 @@ void AGameplayAIC::UpdateFiringRotation(float DeltaSeconds)
 	TObjectPtr<APawn> PossessedPawn = GetPawn();
 	if (!IsValid(PossessedPawn)) { return; }
 
-	float RotationSpeed = (AccuracyCorrectionMoveSpeed * DeltaSeconds);
 	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(PossessedPawn->GetActorLocation(), TargetPawn->GetActorLocation());
-	
-	FRotator RotationDifference = UKismetMathLibrary::NormalizedDeltaRotator(CurrentFiringRotation, TargetRotation);
-
-	FQuat RotatedQuat = FQuat::Slerp(FQuat(CurrentFiringRotation), FQuat(TargetRotation), RotationSpeed);
-	CurrentFiringRotation = FRotator(RotatedQuat);
+	CurrentFiringRotation = UKismetMathLibrary::RInterpTo(CurrentFiringRotation, TargetRotation, DeltaSeconds, AccuracyCorrectionMoveSpeed);
 }
 
 void AGameplayAIC::UpdateFiring()

@@ -30,6 +30,7 @@ void UBTService_UpdateEnemyInfo::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 	}
 
 	Blackboard->SetValueAsBool(OutIsExhausted.SelectedKeyName, BaseCharacter->IsExhausted());
+	Blackboard->SetValueAsBool(OutIsPlayingDamagedMontage.SelectedKeyName, BaseCharacter->IsPlayingDamagedMontage());
 
 	UpdatePlayerInfo(Blackboard, BaseCharacter);
 }
@@ -37,11 +38,25 @@ void UBTService_UpdateEnemyInfo::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 void UBTService_UpdateEnemyInfo::UpdatePlayerInfo(UBlackboardComponent* Blackboard, APawn* AIPawn)
 {
 	if (!IsValid(Blackboard)) { return; }
-	if (!IsValid(AIPawn)) { return; }
+
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	TObjectPtr<ABaseCharacter> AICharacter = Cast<ABaseCharacter>(AIPawn);
+	if (!IsValid(AICharacter)) { return; }
 
 	TObjectPtr<ACharacter> PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (!IsValid(PlayerCharacter)) { return; }
-	
+
+	FHitResult OutHit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(AICharacter);
+	Params.AddIgnoredActor(AICharacter->GetFireableActor());
+
+	World->LineTraceSingleByChannel(OutHit, AIPawn->GetActorLocation(), PlayerCharacter->GetActorLocation(), ECC_Visibility, Params);
+	bool bHitPlayer = (OutHit.GetActor() == PlayerCharacter);
+
 	Blackboard->SetValueAsObject(OutPlayerCharacter.SelectedKeyName, PlayerCharacter);
 	Blackboard->SetValueAsVector(OutPlayerLocation.SelectedKeyName, PlayerCharacter->GetActorLocation());
+	Blackboard->SetValueAsBool(OutHasLOSToPlayer.SelectedKeyName, bHitPlayer);
 }
