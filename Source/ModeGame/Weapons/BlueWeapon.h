@@ -25,4 +25,5 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		bool ReceiveEndFire();
 
+	float GetFalloffAdjustedDamage(float Distance) const override;
 };

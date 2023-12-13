@@ -12,3 +12,13 @@ bool ABlueWeapon::TryEndFire()
 {
 	return (Super::TryEndFire() && ReceiveEndFire());
 }
+
+float ABlueWeapon::GetFalloffAdjustedDamage(float Distance) const
+{
+	if (Distance < MaxRange)
+	{
+		return BaseDamage;
+	}
+
+	return BaseDamage * (MaxRange) / Distance;
+}
