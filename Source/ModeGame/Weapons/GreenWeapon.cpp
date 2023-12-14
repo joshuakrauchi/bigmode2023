@@ -74,7 +74,7 @@ bool AGreenWeapon::TryBeginFire()
 		TScriptInterface<IDamageable> Damageable = Trace.GetActor();
 		if (Damageable != nullptr)
 		{
-			TryDamageDamageable(Damageable, Trace.Distance);
+			TryDamageDamageable(Damageable, TraceStart, Trace.Distance);
 		}
 		else
 		{

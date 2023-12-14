@@ -85,7 +85,7 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 	}
 }
 
-void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColours SourceColour)
+void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, FVector DamageStartLocation, EPlayableColours SourceColour)
 {
 	TObjectPtr<UWorld> World = GetWorld();
 	if (!IsValid(World)) { return; }
@@ -116,6 +116,8 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, EPlayableColou
 		GameplayGS->DecreaseHealth(DamageAmount);
 
 		PlayDamagedPlayerSFX();
+
+		CreateDamageIndicator(DamageStartLocation, GetColorFromCollection(SourceColour));
 	}
 	else
 	{
@@ -245,7 +247,7 @@ bool ABaseCharacter::IsPlayingDamagedMontage() const
 	return bIsPlayingDamagedMontage;
 }
 
-FLinearColor ABaseCharacter::GetColorFromCollection() const
+FLinearColor ABaseCharacter::GetColorFromCollection(EPlayableColours Colour) const
 {
 	FLinearColor Color = FLinearColor::White;
 
@@ -257,7 +259,7 @@ FLinearColor ABaseCharacter::GetColorFromCollection() const
 	TObjectPtr<UMaterialParameterCollectionInstance> GameColorsInstance = World->GetParameterCollectionInstance(GameColors);
 	if (!IsValid(GameColorsInstance)) { return Color; }
 
-	switch (CharacterColour)
+	switch (Colour)
 	{
 	case EPlayableColours::Grey:
 	{
@@ -419,7 +421,7 @@ void ABaseCharacter::SpawnExplodingDeathCharacter()
 	if (!IsValid(TPMesh)) { return; }
 	
 	TObjectPtr<AExplodingDeathCharacter> ExplodingDeathCharacter = World->SpawnActor<AExplodingDeathCharacter>(CharacterToSpawnOnDeath, TPMesh->GetComponentLocation(), GetActorRotation());
-	ExplodingDeathCharacter->ApplyMaterial(TPMesh->GetMaterial(0), GetColorFromCollection());
+	ExplodingDeathCharacter->ApplyMaterial(TPMesh->GetMaterial(0), GetColorFromCollection(CharacterColour));
 }
 
 void ABaseCharacter::SetScoreText(int Number, EPlayableColours Colour)
@@ -428,7 +430,7 @@ void ABaseCharacter::SetScoreText(int Number, EPlayableColours Colour)
 
 	ScoreTextRenderComponent->SetRelativeLocation(UKismetMathLibrary::RandomUnitVector() * 50.0f);
 
-	FLinearColor RenderColor = GetColorFromCollection();
+	FLinearColor RenderColor = GetColorFromCollection(Colour);
 
 	ScoreTextRenderComponent->SetTextRenderColor(RenderColor.ToFColor(true));
 	ScoreTextRenderComponent->SetText(FText::FromString(FString::Printf(TEXT("+%d"), Number)));

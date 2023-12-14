@@ -85,6 +85,6 @@ public:
 		USkeletalMeshComponent* GetVisibleMesh() const;
 
 	UFUNCTION(BlueprintCallable)
-		bool TryDamageDamageable(TScriptInterface<IDamageable> Damageable, float Distance);
+		bool TryDamageDamageable(TScriptInterface<IDamageable> Damageable, FVector DamageStartLocation, float Distance);
 
 };

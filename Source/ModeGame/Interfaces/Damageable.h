@@ -24,6 +24,6 @@ class MODEGAME_API IDamageable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		void OnDamaged(float DamageAmount, EPlayableColours SourceColour = EPlayableColours::None);
+		void OnDamaged(float DamageAmount, FVector DamageStartLocation, EPlayableColours SourceColour = EPlayableColours::None);
 
 };

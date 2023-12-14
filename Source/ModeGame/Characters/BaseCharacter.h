@@ -105,7 +105,7 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
-	virtual void OnDamaged_Implementation(float DamageAmount, EPlayableColours SourceColour = EPlayableColours::None) override;
+	virtual void OnDamaged_Implementation(float DamageAmount, FVector DamageStartLocation, EPlayableColours SourceColour = EPlayableColours::None) override;
 
 	UFUNCTION(BlueprintCallable)
 		USkeletalMeshComponent* GetFirstPersonMesh() const;
@@ -162,10 +162,13 @@ public:
 		bool IsPlayingDamagedMontage() const;
 
 	UFUNCTION()
-		FLinearColor GetColorFromCollection() const;
+		FLinearColor GetColorFromCollection(EPlayableColours Colour) const;
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void UpdateMoveToSafeSpawner(float DeltaSeconds);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void CreateDamageIndicator(FVector DamageStartLocation, FLinearColor DamageColor);
 
 private:
 	UFUNCTION()

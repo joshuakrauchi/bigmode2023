@@ -84,7 +84,7 @@ USkeletalMeshComponent* ABaseWeapon::GetVisibleMesh() const
 	}
 }
 
-bool ABaseWeapon::TryDamageDamageable(TScriptInterface<IDamageable> Damageable, float Distance)
+bool ABaseWeapon::TryDamageDamageable(TScriptInterface<IDamageable> Damageable, FVector DamageStartLocation, float Distance)
 {
 	TObjectPtr<ABaseCharacter> BaseCharacter = GetOwner<ABaseCharacter>();
 	if (!IsValid(BaseCharacter)) { return false; }
@@ -97,7 +97,7 @@ bool ABaseWeapon::TryDamageDamageable(TScriptInterface<IDamageable> Damageable, 
 		return false;
 	}
 
-	IDamageable::Execute_OnDamaged(DamageablePawn, GetFalloffAdjustedDamage(Distance), BaseCharacter->CharacterColour);
+	IDamageable::Execute_OnDamaged(DamageablePawn, GetFalloffAdjustedDamage(Distance), DamageStartLocation, BaseCharacter->CharacterColour);
 
 	return true;
 }
