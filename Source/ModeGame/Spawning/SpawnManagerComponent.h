@@ -8,22 +8,6 @@
 
 class ASpawner;
 
-USTRUCT()
-struct FSpawnInfo
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere)
-		TObjectPtr<UClass> ActorClass = nullptr;
-
-	UPROPERTY(EditAnywhere)
-		float InitialTimeBeforeSpawn = 0.0f;
-
-	UPROPERTY(EditAnywhere)
-		float BaseTimeBetweenSpawns = 0.0f;
-};
-
 UCLASS()
 class MODEGAME_API USpawnManagerComponent : public UActorComponent
 {
@@ -31,16 +15,16 @@ class MODEGAME_API USpawnManagerComponent : public UActorComponent
 
 private:
 	UPROPERTY(EditAnywhere)
-		TArray<FSpawnInfo> SpawnInfos;
+		TArray<TObjectPtr<UClass>> PossibleSpawns;
 
 	UPROPERTY(EditAnywhere)
-		float BaseSpawnTimeMultiplier = 1.0f;
+		float SpawnMultiplierBaseToPowOfNumCharacters = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+		float BaseSpawnTime = 1.0f;
 
 	UPROPERTY()
-		float CurrentSpawnTimeMultiplier = 1.0f;
-
-	UPROPERTY()
-		TMap<TObjectPtr<UClass>, float> TimeBeforeSpawnByClass;
+		float CurrentSpawnTime = 0.0f;
 
 	UPROPERTY()
 		TArray<TObjectPtr<ASpawner>> Spawners;
@@ -68,5 +52,7 @@ public:
 
 private:
 	bool TrySpawnActor(UClass* ActorClass, AActor*& OutSpawnedActor);
+
+	void ResetSpawnTime();
 
 };

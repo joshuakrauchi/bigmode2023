@@ -51,6 +51,16 @@ void ABaseCharacter::BeginPlay()
 	CurrentHealth = BaseHealth;
 
 	SpawnFireable();
+
+	TObjectPtr<UWorld> World = GetWorld();
+	if (IsValid(World))
+	{
+		TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+		if (IsValid(GameplayGS))
+		{
+			GameplayGS->RegisterCharacter(this);
+		}
+	}
 }
 
 // Called when the game stops or when despawned
@@ -60,6 +70,16 @@ void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (IsValid(Weapon))
 	{
 		Weapon->Destroy();
+	}
+
+	TObjectPtr<UWorld> World = GetWorld();
+	if (IsValid(World))
+	{
+		TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+		if (IsValid(GameplayGS))
+		{
+			GameplayGS->DeregisterCharacter(this);
+		}
 	}
 }
 
@@ -230,8 +250,8 @@ FVector ABaseCharacter::GetProjectileEndLocation(float Range, float ScatterRange
 	if (ScatterRange > 0.0f)
 	{
 		float HalfRange = (ScatterRange / 2.0f);
-		FRotator RandomRotation = FRotator(FMath::RandRange(-HalfRange, HalfRange), FMath::RandRange(-HalfRange, HalfRange), 0.0f);
-		Movement = RandomRotation.RotateVector(Movement);
+		FVector RandomRotation = FMath::VRandCone(Movement, FMath::DegreesToRadians(HalfRange));
+		Movement += RandomRotation;
 	}
 
 	return ((Movement * Range) + Camera->GetComponentLocation());
