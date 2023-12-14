@@ -17,6 +17,9 @@ void UBTService_UpdateEnemyInfo::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 	TObjectPtr<UBlackboardComponent> Blackboard = OwnerComp.GetBlackboardComponent();
 	if (!IsValid(Blackboard)) { return; }
 
+	Blackboard->SetValueAsVector(OutPlayerLocation.SelectedKeyName, FVector(-500.0f, 65.0f, 213.0f));
+	return;
+
 	TObjectPtr<AAIController> AIController = OwnerComp.GetAIOwner();
 	if (!IsValid(AIController)) { return; }
 

@@ -107,6 +107,8 @@ bool AGreenWeapon::CanFire() const
 
 void AGreenWeapon::SpawnDecal(FVector Location, FVector Normal, USceneComponent* AttachComponent)
 {
+	return;
+
 	if (!IsValid(DecalMaterial)) { return; }
 	if (!IsValid(AttachComponent)) { return; }
 
@@ -128,6 +130,8 @@ void AGreenWeapon::SpawnDecal(FVector Location, FVector Normal, USceneComponent*
 
 void AGreenWeapon::SpawnBulletTrail(FVector BeamEnd)
 {
+	return;
+
 	TObjectPtr<UWorld> World = GetWorld();
 	if (!IsValid(World)) { return; }
 

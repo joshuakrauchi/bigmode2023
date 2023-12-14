@@ -40,6 +40,7 @@ void AGameplayAIC::Tick(float DeltaTime)
 	TObjectPtr<ACharacter> PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (!IsValid(PlayerCharacter)) { return; }
 
+	return;
 	UpdateFiringRotation(DeltaTime);
 	UpdateFocus();
 	UpdateFiring();
