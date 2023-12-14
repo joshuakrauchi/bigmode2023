@@ -66,6 +66,12 @@ public:
 	UPROPERTY(EditAnywhere)
 		TObjectPtr<UMaterialParameterCollection> GameColors = nullptr;
 
+	UPROPERTY(BlueprintReadWrite)
+		FVector SafeSpawnerLocation;
+
+	UPROPERTY(BlueprintReadWrite)
+		bool bIsMovingToSafeSpawner = false;
+
 private:
 	UPROPERTY()
 		TObjectPtr<AActor> FireableActor = nullptr;
@@ -87,6 +93,9 @@ private:
 
 	UPROPERTY()
 		float CurrentTimeBeforeScoreTextDisappear = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float SafeSpawnerMoveSpeed = 0.0f;
 
 public:
 	// Sets default values for this character's properties
@@ -164,7 +173,7 @@ public:
 	UFUNCTION()
 		FLinearColor GetColorFromCollection(EPlayableColours Colour) const;
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION()
 		void UpdateMoveToSafeSpawner(float DeltaSeconds);
 
 	UFUNCTION(BlueprintImplementableEvent)

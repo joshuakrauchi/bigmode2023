@@ -5,6 +5,9 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Characters/BaseCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/DecalComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 ABaseWeapon::ABaseWeapon()
@@ -46,11 +49,14 @@ void ABaseWeapon::Tick(float DeltaTime)
 
 bool ABaseWeapon::TryBeginFire()
 {
+	bIsHoldingFire = true;
 	return true;
 }
 
 bool ABaseWeapon::TryEndFire()
 {
+	bIsHoldingFire = false;
+
 	return true;
 }
 
@@ -86,6 +92,11 @@ USkeletalMeshComponent* ABaseWeapon::GetVisibleMesh() const
 	}
 }
 
+bool ABaseWeapon::IsHoldingFire() const
+{
+	return bIsHoldingFire;
+}
+
 bool ABaseWeapon::TryDamageDamageable(TScriptInterface<IDamageable> Damageable, FVector DamageStartLocation, float Distance)
 {
 	TObjectPtr<ABaseCharacter> BaseCharacter = GetOwner<ABaseCharacter>();
@@ -102,6 +113,37 @@ bool ABaseWeapon::TryDamageDamageable(TScriptInterface<IDamageable> Damageable, 
 	IDamageable::Execute_OnDamaged(DamageablePawn, GetFalloffAdjustedDamage(Distance), DamageStartLocation, BaseCharacter->CharacterColour);
 
 	return true;
+}
+
+void ABaseWeapon::SpawnDecal(FVector Location, FVector Normal, USceneComponent* AttachComponent)
+{
+	if (!IsValid(DecalMaterial)) { return; }
+	if (!IsValid(AttachComponent)) { return; }
+
+	TObjectPtr<UDecalComponent> Decal = UGameplayStatics::SpawnDecalAttached(
+		DecalMaterial,
+		FVector(DecalSize),
+		AttachComponent,
+		NAME_None,
+		Location,
+		Normal.ToOrientationRotator(),
+		EAttachLocation::KeepWorldPosition,
+		DecalLifetime
+	);
+
+	if (!IsValid(Decal)) { return; }
+
+	Decal->SetFadeScreenSize(0.0f);
+}
+
+void ABaseWeapon::SpawnImpactSparks(FVector Location)
+{
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	if (!IsValid(ImpactSparksSystem)) { return; }
+	
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, ImpactSparksSystem, Location);
 }
 
 UAnimSequence* ABaseWeapon::GetArmedAnimSequence_Implementation() const

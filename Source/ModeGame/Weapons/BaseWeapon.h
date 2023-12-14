@@ -12,6 +12,7 @@ class UAnimSequence;
 class UAimOffsetBlendSpace;
 class USkeletalMeshComponent;
 class IDamageable;
+class UNiagaraSystem;
 
 UCLASS()
 class MODEGAME_API ABaseWeapon : public AActor, public IFireable
@@ -34,6 +35,17 @@ protected:
 	UPROPERTY(EditAnywhere)
 		float DamageFalloffEndRange = 0.0f;
 
+	UPROPERTY(EditAnywhere)
+		TObjectPtr<UMaterialInterface> DecalMaterial = nullptr;
+
+	UPROPERTY(EditAnywhere)
+		float DecalSize = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float DecalLifetime = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		TObjectPtr<UNiagaraSystem> ImpactSparksSystem = nullptr;
 	
 	const FTransform* EquippedTransform = nullptr;
 
@@ -54,6 +66,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		TObjectPtr<USkeletalMeshComponent> ThirdPersonMesh = nullptr;
+
+	UPROPERTY()
+		bool bIsHoldingFire = false;
 
 public:
 	// Sets default values for this actor's properties
@@ -76,7 +91,6 @@ public:
 	virtual bool TryEquipToParentTransform(const FTransform& Transform, USkeletalMeshComponent* FPMeshAttachment, USkeletalMeshComponent* TPMeshAttachment, FName SocketName) override;
 	// end IFireable
 
-public:
 	UFUNCTION(BlueprintCallable)
 		virtual float GetFalloffAdjustedDamage(float Distance) const;
 
@@ -92,5 +106,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool TryDamageDamageable(TScriptInterface<IDamageable> Damageable, FVector DamageStartLocation, float Distance);
+
+	UFUNCTION(BlueprintCallable)
+		bool IsHoldingFire() const;
+
+protected:
+	UFUNCTION()
+		void SpawnDecal(FVector Location, FVector Normal, USceneComponent* AttachComponent);
+
+	UFUNCTION()
+		void SpawnImpactSparks(FVector Location);
 
 };

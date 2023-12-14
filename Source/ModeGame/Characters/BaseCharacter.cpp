@@ -9,6 +9,7 @@
 #include "Components/TextRenderComponent.h"
 #include "Characters/ExplodingDeathCharacter.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
+#include "Components/CapsuleComponent.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -308,6 +309,36 @@ FLinearColor ABaseCharacter::GetColorFromCollection(EPlayableColours Colour) con
 	}
 
 	return Color;
+}
+
+void ABaseCharacter::UpdateMoveToSafeSpawner(float DeltaSeconds)
+{
+	if (!bIsMovingToSafeSpawner) { return; }
+
+	TObjectPtr<UCharacterMovementComponent> Movement = GetCharacterMovement();
+	if (!IsValid(Movement)) { return; }
+
+	Movement->Velocity = FVector::Zero();
+
+	FVector Location = GetActorLocation();
+	FVector Direction = (SafeSpawnerLocation - Location);
+	Direction.Normalize();
+	Direction *= (SafeSpawnerMoveSpeed * DeltaSeconds);
+
+	SetActorLocation(Direction + Location);
+
+	float DistanceSq = FVector::DistSquared(SafeSpawnerLocation, GetActorLocation());
+	if (DistanceSq <= 2500.0f)
+	{
+		TObjectPtr<UCapsuleComponent> Capsule = GetCapsuleComponent();
+		TObjectPtr<AController> CurrentController = GetController();
+		if (IsValid(CurrentController) && IsValid(Capsule))
+		{
+			CurrentController->SetIgnoreMoveInput(false);
+			Capsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			bIsMovingToSafeSpawner = false;
+		}
+	}
 }
 
 void ABaseCharacter::SpawnFireable()

@@ -35,8 +35,6 @@ void AGreenWeapon::Tick(float DeltaSeconds)
 
 bool AGreenWeapon::TryBeginFire()
 {
-	bIsHoldingFire = true;
-
 	if (!CanFire()) { return false; }
 
 	TObjectPtr<UWorld> World = GetWorld();
@@ -77,10 +75,7 @@ bool AGreenWeapon::TryBeginFire()
 		{
 			SpawnDecal(Trace.ImpactPoint, Trace.ImpactNormal, Trace.GetComponent());
 
-			if (IsValid(ImpactSparksSystem))
-			{
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, ImpactSparksSystem, Trace.ImpactPoint);
-			}
+			SpawnImpactSparks(Trace.ImpactPoint);
 		}
 	}
 
@@ -95,35 +90,12 @@ bool AGreenWeapon::TryBeginFire()
 
 bool AGreenWeapon::TryEndFire()
 {
-	bIsHoldingFire = false;
-
 	return Super::TryEndFire();
 }
 
 bool AGreenWeapon::CanFire() const
 {
 	return (CurrentShotCooldownTime <= 0.0f);
-}
-
-void AGreenWeapon::SpawnDecal(FVector Location, FVector Normal, USceneComponent* AttachComponent)
-{
-	if (!IsValid(DecalMaterial)) { return; }
-	if (!IsValid(AttachComponent)) { return; }
-
-	TObjectPtr<UDecalComponent> Decal = UGameplayStatics::SpawnDecalAttached(
-		DecalMaterial,
-		FVector(DecalSize),
-		AttachComponent,
-		NAME_None,
-		Location,
-		Normal.ToOrientationRotator(),
-		EAttachLocation::KeepWorldPosition,
-		300.0f
-	);
-	
-	if (!IsValid(Decal)) { return; }
-
-	Decal->SetFadeScreenSize(0.0f);
 }
 
 void AGreenWeapon::SpawnBulletTrail(FVector BeamEnd)

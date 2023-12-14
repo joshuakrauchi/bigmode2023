@@ -32,19 +32,7 @@ private:
 		float MaxSpreadDegrees = 0.1f;
 
 	UPROPERTY(EditAnywhere)
-		float DecalSize = 0.0f;
-	
-	UPROPERTY(EditAnywhere)
-		TObjectPtr<UMaterialInterface> DecalMaterial = nullptr;
-
-	UPROPERTY(EditAnywhere)
-		TObjectPtr<UNiagaraSystem> ImpactSparksSystem = nullptr;
-
-	UPROPERTY(EditAnywhere)
 		TObjectPtr<UNiagaraSystem> BulletTrailSystem = nullptr;
-
-	UPROPERTY()
-		bool bIsHoldingFire = false;
 
 public:
 	AGreenWeapon();
@@ -68,14 +56,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		bool ReceiveTestFire();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlayFiringSFX();
+
 	UFUNCTION(BlueprintCallable)
 		bool CanFire() const;
 
 private:
-	UFUNCTION(BlueprintCallable)
-		void SpawnDecal(FVector Location, FVector Normal, USceneComponent* AttachComponent);
-
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 		void SpawnBulletTrail(FVector BeamEnd);
 
 };
