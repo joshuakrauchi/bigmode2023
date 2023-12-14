@@ -57,12 +57,9 @@ bool AGreenWeapon::TryBeginFire()
 	// Finds hits
 	for (int i = 0; i < MaxPellets; ++i)
 	{
-		FVector RandomSpread{ FMath::Tan(FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians)), 
-							  FMath::Tan(FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians)), 
-							  FMath::Tan(FMath::RandRange(-MaxSpreadRadians, MaxSpreadRadians)) };
-		FVector AdjustedForward = (ParentForward + RandomSpread) * MaxRange;
+		FVector AdjustedForward = BaseCharacter->GetProjectileEndLocation(MaxRange, MaxSpreadDegrees);
 
-		World->LineTraceSingleByChannel(Trace, TraceStart, ParentLocation + AdjustedForward, ECollisionChannel::ECC_Visibility, CollisionParams);
+		World->LineTraceSingleByChannel(Trace, TraceStart, AdjustedForward, ECollisionChannel::ECC_Visibility, CollisionParams);
 		if (!Trace.IsValidBlockingHit())
 		{
 			SpawnBulletTrail(ParentLocation + AdjustedForward);

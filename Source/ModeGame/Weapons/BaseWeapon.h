@@ -26,7 +26,13 @@ protected:
 		float BaseDamage = 0.0f;
 
 	UPROPERTY(EditAnywhere)
+		float MinimumDamage = 0.0f;
+
+	UPROPERTY(EditAnywhere)
 		float DamageFalloffRange = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float DamageFalloffEndRange = 0.0f;
 
 	
 	const FTransform* EquippedTransform = nullptr;

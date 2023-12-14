@@ -66,7 +66,9 @@ bool ABaseWeapon::TryEquipToParentTransform(const FTransform& Transform, USkelet
 
 float ABaseWeapon::GetFalloffAdjustedDamage(float Distance) const
 {
-	return BaseDamage * (1000 / Distance);
+	float AdjustedDistance = FMath::Clamp((Distance - DamageFalloffRange) / (DamageFalloffEndRange - DamageFalloffRange), 0, 1);
+
+	return FMath::Lerp(BaseDamage, MinimumDamage, AdjustedDistance);
 }
 
 USkeletalMeshComponent* ABaseWeapon::GetVisibleMesh() const

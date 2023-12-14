@@ -29,7 +29,7 @@ private:
 		int MaxPellets = 8;
 
 	UPROPERTY(EditAnywhere)
-		float MaxSpreadRadians = 0.1f;
+		float MaxSpreadDegrees = 0.1f;
 
 	UPROPERTY(EditAnywhere)
 		float DecalSize = 0.0f;
