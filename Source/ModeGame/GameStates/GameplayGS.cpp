@@ -24,7 +24,7 @@ USpawnManagerComponent* AGameplayGS::GetSpawnManager() const
 
 void AGameplayGS::IncreaseHealth(float Amount)
 {
-	CurrentHealth = FMath::Min(BaseHealth, CurrentHealth + Amount);
+	CurrentHealth += FMath::Min(BaseHealth, CurrentHealth + Amount);
 }
 
 void AGameplayGS::DecreaseHealth(float Amount)
