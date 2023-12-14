@@ -7,6 +7,7 @@
 #include "GameplayGS.generated.h"
 
 class USpawnManagerComponent;
+class ABaseCharacter;
 
 /**
  * 
@@ -30,6 +31,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<USpawnManagerComponent> SpawnManagerComponent = nullptr;
 
+	UPROPERTY()
+		TSet<TObjectPtr<ABaseCharacter>> AllCharacters;
+
 public:
 	AGameplayGS();
 
@@ -52,4 +56,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void AddScore(int ScoreAmount);
+
+	UFUNCTION()
+		void RegisterCharacter(ABaseCharacter* Character);
+
+	UFUNCTION()
+		void DeregisterCharacter(ABaseCharacter* Character);
+
+	UFUNCTION()
+		int GetNumCharacters() const;
+
 };

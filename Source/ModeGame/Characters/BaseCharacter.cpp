@@ -51,6 +51,16 @@ void ABaseCharacter::BeginPlay()
 	CurrentHealth = BaseHealth;
 
 	SpawnFireable();
+
+	TObjectPtr<UWorld> World = GetWorld();
+	if (IsValid(World))
+	{
+		TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+		if (IsValid(GameplayGS))
+		{
+			GameplayGS->RegisterCharacter(this);
+		}
+	}
 }
 
 // Called when the game stops or when despawned
@@ -60,6 +70,16 @@ void ABaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (IsValid(Weapon))
 	{
 		Weapon->Destroy();
+	}
+
+	TObjectPtr<UWorld> World = GetWorld();
+	if (IsValid(World))
+	{
+		TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+		if (IsValid(GameplayGS))
+		{
+			GameplayGS->DeregisterCharacter(this);
+		}
 	}
 }
 

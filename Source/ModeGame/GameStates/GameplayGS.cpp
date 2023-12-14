@@ -49,3 +49,18 @@ void AGameplayGS::AddScore(int ScoreAmount)
 
 	CurrentScore += ScoreAmount;
 }
+
+void AGameplayGS::RegisterCharacter(ABaseCharacter* Character)
+{
+	AllCharacters.Add(Character);
+}
+
+void AGameplayGS::DeregisterCharacter(ABaseCharacter* Character)
+{
+	AllCharacters.Remove(Character);
+}
+
+int AGameplayGS::GetNumCharacters() const
+{
+	return AllCharacters.Num();
+}
