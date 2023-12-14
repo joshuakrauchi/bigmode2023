@@ -230,8 +230,8 @@ FVector ABaseCharacter::GetProjectileEndLocation(float Range, float ScatterRange
 	if (ScatterRange > 0.0f)
 	{
 		float HalfRange = (ScatterRange / 2.0f);
-		FRotator RandomRotation = FRotator(FMath::RandRange(-HalfRange, HalfRange), FMath::RandRange(-HalfRange, HalfRange), 0.0f);
-		Movement = RandomRotation.RotateVector(Movement);
+		FVector RandomRotation = FMath::VRandCone(Movement, FMath::DegreesToRadians(HalfRange));
+		Movement += RandomRotation;
 	}
 
 	return ((Movement * Range) + Camera->GetComponentLocation());
