@@ -17,6 +17,11 @@ void AGameplayGS::BeginPlay()
 	CurrentHealth = BaseHealth;
 }
 
+void AGameplayGS::Tick(float DeltaSeconds)
+{
+	UpdateComboEndTime(DeltaSeconds);
+}
+
 USpawnManagerComponent* AGameplayGS::GetSpawnManager() const
 {
 	return SpawnManagerComponent;
@@ -24,7 +29,7 @@ USpawnManagerComponent* AGameplayGS::GetSpawnManager() const
 
 void AGameplayGS::IncreaseHealth(float Amount)
 {
-	CurrentHealth += FMath::Min(BaseHealth, CurrentHealth + Amount);
+	CurrentHealth = FMath::Min(BaseHealth, CurrentHealth + Amount);
 }
 
 void AGameplayGS::DecreaseHealth(float Amount)
@@ -47,7 +52,7 @@ void AGameplayGS::AddScore(int ScoreAmount)
 {
 	if (ScoreAmount <= 0) { return; }
 
-	CurrentScore += ScoreAmount;
+	CurrentScore += (ScoreAmount * (1.0f + (ScoreMultiplierIncreasePerComboKill * CurrentComboCount)));
 }
 
 void AGameplayGS::RegisterCharacter(ABaseCharacter* Character)
@@ -63,4 +68,26 @@ void AGameplayGS::DeregisterCharacter(ABaseCharacter* Character)
 int AGameplayGS::GetNumCharacters() const
 {
 	return AllCharacters.Num();
+}
+
+void AGameplayGS::IncrementComboCount()
+{
+	++CurrentComboCount;
+
+	CurrentTimeUntilComboEnd = BaseTimeUntilComboEnd;
+}
+
+void AGameplayGS::ClearComboCount()
+{
+	CurrentComboCount = 0;
+}
+
+void AGameplayGS::UpdateComboEndTime(float DeltaSeconds)
+{
+	CurrentTimeUntilComboEnd -= DeltaSeconds;
+
+	if (CurrentTimeUntilComboEnd <= 0.0f)
+	{
+		ClearComboCount();
+	}
 }

@@ -374,6 +374,14 @@ void ABaseCharacter::UpdateResetDoubleJump()
 
 void ABaseCharacter::OnHealthDepleted()
 {
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+	if (!IsValid(GameplayGS)) { return; }
+
+	GameplayGS->IncrementComboCount();
+
 	SpawnExplodingDeathCharacter();
 
 	Destroy();
@@ -484,7 +492,7 @@ void ABaseCharacter::SetScoreText(int Number, EPlayableColours Colour)
 	FLinearColor RenderColor = GetColorFromCollection(Colour);
 
 	ScoreTextRenderComponent->SetTextRenderColor(RenderColor.ToFColor(true));
-	ScoreTextRenderComponent->SetText(FText::FromString(FString::Printf(TEXT("+%d"), Number)));
+	ScoreTextRenderComponent->SetText(FText::FromString(FString::Printf(TEXT("%d"), Number)));
 	ScoreTextRenderComponent->SetVisibility(true);
 	CurrentTimeBeforeScoreTextDisappear = BaseTimeBeforeScoreTextDisappear;
 }

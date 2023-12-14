@@ -29,6 +29,12 @@ private:
 	UPROPERTY()
 		TArray<TObjectPtr<ASpawner>> Spawners;
 
+	UPROPERTY(EditAnywhere)
+		int MinCharactersSpawned = 0;
+
+	UPROPERTY(EditAnywhere)
+		int MaxCharactersSpawned = 0;
+
 public:
 	// Sets default values for this component's properties
 	USpawnManagerComponent();
@@ -51,8 +57,10 @@ public:
 		ASpawner* GetClosestSpawnerToLocation(FVector Location) const;
 
 private:
-	bool TrySpawnActor(UClass* ActorClass, AActor*& OutSpawnedActor);
+	UFUNCTION()
+		bool TrySpawnActor(UClass* ActorClass, AActor*& OutSpawnedActor);
 
-	void ResetSpawnTime();
+	UFUNCTION()
+		void ResetSpawnTime();
 
 };

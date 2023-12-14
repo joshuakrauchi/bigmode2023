@@ -26,9 +26,16 @@ void USpawnManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+	if (!IsValid(GameplayGS)) { return; }
+
 	CurrentSpawnTime -= DeltaTime;
 
-	if (CurrentSpawnTime > 0.0f) { return; }
+	int NumCharacters = GameplayGS->GetNumCharacters();
+	if ((NumCharacters >= MinCharactersSpawned) && ((NumCharacters >= MaxCharactersSpawned) || CurrentSpawnTime > 0.0f)) { return; }
 
 	if (PossibleSpawns.Num() <= 0) { return; }
 

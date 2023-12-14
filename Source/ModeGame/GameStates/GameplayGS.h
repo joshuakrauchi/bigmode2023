@@ -27,6 +27,18 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		int64 CurrentScore = 0.0f;
 
+	UPROPERTY(EditAnywhere)
+		float ScoreMultiplierIncreasePerComboKill = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float BaseTimeUntilComboEnd = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly)
+		float CurrentTimeUntilComboEnd = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly)
+		int CurrentComboCount = 0;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<USpawnManagerComponent> SpawnManagerComponent = nullptr;
@@ -38,6 +50,8 @@ public:
 	AGameplayGS();
 
 	virtual void BeginPlay();
+
+	virtual void Tick(float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintCallable)
 		USpawnManagerComponent* GetSpawnManager() const;
@@ -65,5 +79,15 @@ public:
 
 	UFUNCTION()
 		int GetNumCharacters() const;
+
+	UFUNCTION(BlueprintCallable)
+		void IncrementComboCount();
+
+	UFUNCTION()
+		void ClearComboCount();
+
+private:
+	UFUNCTION()
+		void UpdateComboEndTime(float DeltaSeconds);
 
 };
