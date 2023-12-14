@@ -29,17 +29,13 @@ void AGameplayGS::IncreaseHealth(float Amount)
 
 void AGameplayGS::DecreaseHealth(float Amount)
 {
+	bool bAlreadyDead = (CurrentHealth <= 0.0f);
 	CurrentHealth -= Amount;
 
-	if (CurrentHealth <= 0.0f)
+	if (!bAlreadyDead && (CurrentHealth <= 0.0f))
 	{
 		OnHealthDepleted();
 	}
-}
-
-void AGameplayGS::OnHealthDepleted()
-{
-	UE_LOG(LogTemp, Warning, TEXT("YOU DIED"));
 }
 
 int AGameplayGS::GetScore()

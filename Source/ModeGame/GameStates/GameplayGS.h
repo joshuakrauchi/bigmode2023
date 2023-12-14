@@ -44,7 +44,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DecreaseHealth(float Amount);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintImplementableEvent)
 		void OnHealthDepleted();
 
 	UFUNCTION(BlueprintCallable)
