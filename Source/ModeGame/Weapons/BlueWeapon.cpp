@@ -20,16 +20,12 @@ bool ABlueWeapon::TryBeginFire()
 {
 	Super::TryBeginFire();
 
-	PlayFiringSFX();
-
 	return true;
 }
 
 bool ABlueWeapon::TryEndFire()
 {
 	Super::TryEndFire();
-
-	StopFiringSFX();
 
 	return true;
 }
@@ -69,6 +65,7 @@ void ABlueWeapon::UpdateShooting(float DeltaSeconds)
 
 	CurrentShootTime = BaseShootTime;
 
+	PlayFireSFX();
 	PlayFiringMontage();
 
 	FVector TraceStart = Character->GetProjectileStartLocation();

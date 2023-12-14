@@ -54,10 +54,7 @@ public:
 		void PlayFiringMontage();
 
 	UFUNCTION(BlueprintImplementableEvent)
-		void PlayFiringSFX();
-
-	UFUNCTION(BlueprintImplementableEvent)
-		void StopFiringSFX();
+		void PlayFireSFX();
 
 private:
 	UFUNCTION()
