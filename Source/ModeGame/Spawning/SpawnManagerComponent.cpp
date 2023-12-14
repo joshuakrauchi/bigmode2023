@@ -4,6 +4,7 @@
 #include "Spawning/SpawnManagerComponent.h"
 #include "Spawning/Spawner.h"
 #include "Components/CapsuleComponent.h"
+#include "GameStates/GameplayGS.h"
 
 // Sets default values for this component's properties
 USpawnManagerComponent::USpawnManagerComponent()
@@ -12,18 +13,12 @@ USpawnManagerComponent::USpawnManagerComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	CurrentSpawnTimeMultiplier = BaseSpawnTimeMultiplier;
 }
 
 // Called when the game starts
 void USpawnManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	for (const FSpawnInfo& SpawnInfo : SpawnInfos)
-	{
-		TimeBeforeSpawnByClass.Add(SpawnInfo.ActorClass, SpawnInfo.InitialTimeBeforeSpawn);
-	}
 }
 
 // Called every frame
@@ -31,21 +26,18 @@ void USpawnManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	for (const FSpawnInfo& SpawnInfo : SpawnInfos)
+	CurrentSpawnTime -= DeltaTime;
+
+	if (CurrentSpawnTime > 0.0f) { return; }
+
+	if (PossibleSpawns.Num() <= 0) { return; }
+
+	AActor* SpawnedActor = nullptr;
+	bool bSpawnSucceeded = TrySpawnActor(PossibleSpawns[FMath::RandRange(0, PossibleSpawns.Num() - 1)], SpawnedActor);
+
+	if (bSpawnSucceeded)
 	{
-		float& TimeBeforeSpawn = TimeBeforeSpawnByClass[SpawnInfo.ActorClass];
-
-		TimeBeforeSpawn -= DeltaTime;
-		if (TimeBeforeSpawn < 0.0f)
-		{
-			AActor* SpawnedActor = nullptr;
-			bool bSpawnSucceeded = TrySpawnActor(SpawnInfo.ActorClass, SpawnedActor);
-
-			if (bSpawnSucceeded)
-			{
-				TimeBeforeSpawn = (SpawnInfo.BaseTimeBetweenSpawns * CurrentSpawnTimeMultiplier);
-			}
-		}
+		ResetSpawnTime();
 	}
 }
 
@@ -65,7 +57,14 @@ ASpawner* USpawnManagerComponent::DetermineBestSpawner()
 	{
 		if (!IsValid(Spawner)) { continue; }
 		float CurrentSeconds = Spawner->GetSecondsSinceLastSpawn();
-		if (CurrentSeconds > SecondsSinceLastSpawn)
+		
+		bool bReplaceBest = (CurrentSeconds > SecondsSinceLastSpawn);
+		if ((CurrentSeconds == SecondsSinceLastSpawn) && FMath::RandBool())
+		{
+			bReplaceBest = true;
+		}
+
+		if (bReplaceBest)
 		{
 			LeastRecentlyUsedSpawner = Spawner;
 			SecondsSinceLastSpawn = CurrentSeconds;
@@ -106,4 +105,15 @@ bool USpawnManagerComponent::TrySpawnActor(UClass* ActorClass, AActor*& OutSpawn
 	bool bSpawnSucceeded = BestSpawner->TrySpawnActor(ActorClass, OutSpawnedActor);
 
 	return bSpawnSucceeded;
+}
+
+void USpawnManagerComponent::ResetSpawnTime()
+{
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+	if (!IsValid(GameplayGS)) { return; }
+
+	CurrentSpawnTime = (BaseSpawnTime * FMath::Pow(SpawnMultiplierBaseToPowOfNumCharacters, GameplayGS->GetNumCharacters()));
 }
