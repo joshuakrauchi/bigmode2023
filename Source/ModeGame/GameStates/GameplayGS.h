@@ -8,6 +8,7 @@
 
 class USpawnManagerComponent;
 class ABaseCharacter;
+class UBlackboardComponent;
 
 /**
  * 

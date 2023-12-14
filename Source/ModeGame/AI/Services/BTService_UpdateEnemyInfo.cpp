@@ -17,46 +17,28 @@ void UBTService_UpdateEnemyInfo::TickNode(UBehaviorTreeComponent& OwnerComp, uin
 	TObjectPtr<UBlackboardComponent> Blackboard = OwnerComp.GetBlackboardComponent();
 	if (!IsValid(Blackboard)) { return; }
 
-	TObjectPtr<AAIController> AIController = OwnerComp.GetAIOwner();
-	if (!IsValid(AIController)) { return; }
-
-	TObjectPtr<ABaseCharacter> BaseCharacter = AIController->GetPawn<ABaseCharacter>();
-	if (!IsValid(BaseCharacter)) { return; }
-
-	TObjectPtr<UCharacterMovementComponent> CharacterMovement = BaseCharacter->GetCharacterMovement();
-	if (IsValid(CharacterMovement))
-	{
-		Blackboard->SetValueAsBool(OutIsFalling.SelectedKeyName, CharacterMovement->IsFalling());
-	}
-
-	Blackboard->SetValueAsBool(OutIsExhausted.SelectedKeyName, BaseCharacter->IsExhausted());
-	Blackboard->SetValueAsBool(OutIsPlayingDamagedMontage.SelectedKeyName, BaseCharacter->IsPlayingDamagedMontage());
-
-	UpdatePlayerInfo(Blackboard, BaseCharacter);
-}
-
-void UBTService_UpdateEnemyInfo::UpdatePlayerInfo(UBlackboardComponent* Blackboard, APawn* AIPawn)
-{
-	if (!IsValid(Blackboard)) { return; }
-
 	TObjectPtr<UWorld> World = GetWorld();
 	if (!IsValid(World)) { return; }
 
-	TObjectPtr<ABaseCharacter> AICharacter = Cast<ABaseCharacter>(AIPawn);
+	TObjectPtr<AAIController> AIController = OwnerComp.GetAIOwner();
+	if (!IsValid(AIController)) { return; }
+
+	TObjectPtr<ABaseCharacter> AICharacter = AIController->GetPawn<ABaseCharacter>();
 	if (!IsValid(AICharacter)) { return; }
 
 	TObjectPtr<ACharacter> PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (!IsValid(PlayerCharacter)) { return; }
+
+	Blackboard->SetValueAsBool(OutIsExhausted.SelectedKeyName, AICharacter->IsExhausted());
+	Blackboard->SetValueAsBool(OutIsPlayingDamagedMontage.SelectedKeyName, AICharacter->IsPlayingDamagedMontage());
 
 	FHitResult OutHit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(AICharacter);
 	Params.AddIgnoredActor(AICharacter->GetFireableActor());
 
-	World->LineTraceSingleByChannel(OutHit, AIPawn->GetActorLocation(), PlayerCharacter->GetActorLocation(), ECC_Visibility, Params);
+	World->LineTraceSingleByChannel(OutHit, AICharacter->GetActorLocation(), PlayerCharacter->GetActorLocation(), ECC_Visibility, Params);
 	bool bHitPlayer = (OutHit.GetActor() == PlayerCharacter);
 
-	Blackboard->SetValueAsObject(OutPlayerCharacter.SelectedKeyName, PlayerCharacter);
-	Blackboard->SetValueAsVector(OutPlayerLocation.SelectedKeyName, PlayerCharacter->GetActorLocation());
 	Blackboard->SetValueAsBool(OutHasLOSToPlayer.SelectedKeyName, bHitPlayer);
 }

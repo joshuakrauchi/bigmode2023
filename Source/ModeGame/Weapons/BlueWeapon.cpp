@@ -81,7 +81,7 @@ void ABlueWeapon::UpdateShooting(float DeltaSeconds)
 
 	FHitResult OutHit;
 
-	UKismetSystemLibrary::SphereTraceSingle(GetWorld(), TraceStart, TraceEnd, ShotRadius, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
+	UKismetSystemLibrary::SphereTraceSingle(World, TraceStart, TraceEnd, ShotRadius, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true);
 
 	if (!OutHit.IsValidBlockingHit())
 	{

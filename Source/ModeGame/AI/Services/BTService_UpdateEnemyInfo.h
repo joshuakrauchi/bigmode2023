@@ -17,15 +17,6 @@ class MODEGAME_API UBTService_UpdateEnemyInfo : public UBTService
 	
 public:
 	UPROPERTY(EditAnywhere)
-		FBlackboardKeySelector OutPlayerLocation;
-
-	UPROPERTY(EditAnywhere)
-		FBlackboardKeySelector OutIsFalling;
-
-	UPROPERTY(EditAnywhere)
-		FBlackboardKeySelector OutPlayerCharacter;
-
-	UPROPERTY(EditAnywhere)
 		FBlackboardKeySelector OutIsExhausted;
 
 	UPROPERTY(EditAnywhere)
@@ -36,9 +27,5 @@ public:
 
 public:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
-
-private:
-	UFUNCTION()
-		void UpdatePlayerInfo(UBlackboardComponent* Blackboard, APawn* AIPawn);
 
 };

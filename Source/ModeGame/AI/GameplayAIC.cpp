@@ -34,12 +34,6 @@ void AGameplayAIC::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	ACharacter* AIPawn = GetPawn<ACharacter>();
-	if (!IsValid(AIPawn)) { return; }
-
-	TObjectPtr<ACharacter> PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	if (!IsValid(PlayerCharacter)) { return; }
-
 	UpdateFiringRotation(DeltaTime);
 	UpdateFocus();
 	UpdateFiring();
@@ -92,7 +86,6 @@ void AGameplayAIC::UpdateFocus()
 	if (AIMode != EAIMode::Firing) { return; }
 
 	SetControlRotation(CurrentFiringRotation);
-	
 }
 
 void AGameplayAIC::UpdateFiringRotation(float DeltaSeconds)
@@ -129,6 +122,7 @@ void AGameplayAIC::UpdateFiring()
 void AGameplayAIC::ResetInitialFiringRotation()
 {
 	if (!IsValid(TargetController)) { return; }
+
 	TObjectPtr<APawn> TargetPawn = TargetController->GetPawn();
 	if (!IsValid(TargetPawn)) { return; }
 

@@ -146,7 +146,7 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, FVector Damage
 
 		CurrentHealth -= DamageAmount;
 
-		if (IsExhausted() && !bWasExhausted)
+		if (IsExhausted() && !bWasExhausted && FMath::RandBool())
 		{
 			CurrentInvincibilityTime = BaseInvincibilityTime;
 		}

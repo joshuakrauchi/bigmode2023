@@ -55,7 +55,20 @@ bool AGreenWeapon::TryBeginFire()
 	// Finds hits
 	for (int i = 0; i < MaxPellets; ++i)
 	{
-		FVector AdjustedForward = BaseCharacter->GetProjectileEndLocation(MaxRange, MaxSpreadDegrees);
+		// Halve spread for half of the pellets.
+		float Spread = MaxSpreadDegrees;
+		if (i < MaxPellets / 2.0f)
+		{
+			Spread /= 2.0f;
+
+			// Shoot at least one straight.
+			if (i == 0)
+			{
+				Spread = 0.0f;
+			}
+		}
+
+		FVector AdjustedForward = BaseCharacter->GetProjectileEndLocation(MaxRange, Spread);
 
 		World->LineTraceSingleByChannel(Trace, TraceStart, AdjustedForward, ECollisionChannel::ECC_Visibility, CollisionParams);
 		if (!Trace.IsValidBlockingHit())

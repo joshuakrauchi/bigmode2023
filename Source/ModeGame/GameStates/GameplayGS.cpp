@@ -2,6 +2,9 @@
 
 #include "GameplayGS.h"
 #include "Spawning/SpawnManagerComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 AGameplayGS::AGameplayGS()
 {

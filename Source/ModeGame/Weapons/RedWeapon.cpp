@@ -74,7 +74,6 @@ void ARedWeapon::UpdateShooting(float DeltaSeconds)
 	CurrentTimeBetweenDamages -= DeltaSeconds;
 
 	FVector TraceStart = Character->GetProjectileStartLocation();
-	TraceStart += (Character->GetControlRotation().Vector() * 80.0f);
 	FVector TraceEnd = Character->GetProjectileEndLocation(MaxRange, 0.0f);
 
 	if (!IsHoldingFire())
