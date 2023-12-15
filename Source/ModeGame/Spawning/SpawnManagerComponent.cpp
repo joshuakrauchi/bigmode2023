@@ -5,6 +5,7 @@
 #include "Spawning/Spawner.h"
 #include "Components/CapsuleComponent.h"
 #include "GameStates/GameplayGS.h"
+#include "Spawning/PickupSpawner.h"
 
 // Sets default values for this component's properties
 USpawnManagerComponent::USpawnManagerComponent()
@@ -19,6 +20,8 @@ USpawnManagerComponent::USpawnManagerComponent()
 void USpawnManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CurrentPointsPickupSpawnTime = BasePointsPickupSpawnTime;
 }
 
 // Called every frame
@@ -26,31 +29,18 @@ void USpawnManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	TObjectPtr<UWorld> World = GetWorld();
-	if (!IsValid(World)) { return; }
-
-	TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
-	if (!IsValid(GameplayGS)) { return; }
-
-	CurrentSpawnTime -= DeltaTime;
-
-	int NumCharacters = GameplayGS->GetNumCharacters();
-	if ((NumCharacters >= MinCharactersSpawned) && ((NumCharacters >= MaxCharactersSpawned) || CurrentSpawnTime > 0.0f)) { return; }
-
-	if (PossibleSpawns.Num() <= 0) { return; }
-
-	AActor* SpawnedActor = nullptr;
-	bool bSpawnSucceeded = TrySpawnActor(PossibleSpawns[FMath::RandRange(0, PossibleSpawns.Num() - 1)], SpawnedActor);
-
-	if (bSpawnSucceeded)
-	{
-		ResetSpawnTime();
-	}
+	UpdateEnemySpawns(DeltaTime);
+	UpdatePickupSpawns(DeltaTime);
 }
 
 void USpawnManagerComponent::RegisterSpawner(ASpawner* Spawner)
 {
 	Spawners.Add(Spawner);
+}
+
+void USpawnManagerComponent::RegisterPickupSpawner(APickupSpawner* Spawner)
+{
+	PickupSpawners.Add(Spawner);
 }
 
 ASpawner* USpawnManagerComponent::DetermineBestSpawner()
@@ -65,6 +55,35 @@ ASpawner* USpawnManagerComponent::DetermineBestSpawner()
 		if (!IsValid(Spawner)) { continue; }
 		float CurrentSeconds = Spawner->GetSecondsSinceLastSpawn();
 		
+		bool bReplaceBest = (CurrentSeconds > SecondsSinceLastSpawn);
+		if ((CurrentSeconds == SecondsSinceLastSpawn) && FMath::RandBool())
+		{
+			bReplaceBest = true;
+		}
+
+		if (bReplaceBest)
+		{
+			LeastRecentlyUsedSpawner = Spawner;
+			SecondsSinceLastSpawn = CurrentSeconds;
+		}
+	}
+
+	return LeastRecentlyUsedSpawner;
+}
+
+APickupSpawner* USpawnManagerComponent::DetermineBestPickupSpawner() const
+{
+	if (Spawners.Num() <= 0) { return nullptr; }
+
+	TObjectPtr<APickupSpawner> LeastRecentlyUsedSpawner = nullptr;
+	float SecondsSinceLastSpawn = 0.0f;
+
+	for (const TObjectPtr<APickupSpawner> Spawner : PickupSpawners)
+	{
+		if (!IsValid(Spawner)) { continue; }
+		if (Spawner->HasSpawnedPickup()) { continue; }
+		float CurrentSeconds = Spawner->GetSecondsSinceLastSpawn();
+
 		bool bReplaceBest = (CurrentSeconds > SecondsSinceLastSpawn);
 		if ((CurrentSeconds == SecondsSinceLastSpawn) && FMath::RandBool())
 		{
@@ -102,6 +121,52 @@ ASpawner* USpawnManagerComponent::GetClosestSpawnerToLocation(FVector Location) 
 	}
 
 	return ClosestSpawner;
+}
+
+void USpawnManagerComponent::UpdateEnemySpawns(float DeltaSeconds)
+{
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	TObjectPtr<AGameplayGS> GameplayGS = World->GetGameState<AGameplayGS>();
+	if (!IsValid(GameplayGS)) { return; }
+
+	CurrentSpawnTime -= DeltaSeconds;
+
+	int NumCharacters = GameplayGS->GetNumCharacters();
+	if ((NumCharacters >= MinCharactersSpawned) && ((NumCharacters >= MaxCharactersSpawned) || CurrentSpawnTime > 0.0f)) { return; }
+
+	if (PossibleSpawns.Num() <= 0) { return; }
+
+	AActor* SpawnedActor = nullptr;
+	bool bSpawnSucceeded = TrySpawnActor(PossibleSpawns[FMath::RandRange(0, PossibleSpawns.Num() - 1)], SpawnedActor);
+
+	if (bSpawnSucceeded)
+	{
+		ResetSpawnTime();
+	}
+}
+
+void USpawnManagerComponent::UpdatePickupSpawns(float DeltaSeconds)
+{
+	if (IsValid(SpawnedScorePickup)) { return; }
+
+	CurrentPointsPickupSpawnTime -= DeltaSeconds;
+	if (CurrentPointsPickupSpawnTime > 0.0f) { return; }
+
+	if (!IsValid(PointsPickupClass)) { return; }
+
+	TObjectPtr<APickupSpawner> PickupSpawner = DetermineBestPickupSpawner();
+	if (!IsValid(PickupSpawner)) { return; }
+
+	AActor* SpawnedActor = nullptr;
+	bool bSpawnSucceeded = PickupSpawner->TrySpawnActor(PointsPickupClass, SpawnedActor);
+
+	if (bSpawnSucceeded)
+	{
+		SpawnedScorePickup = SpawnedActor;
+		CurrentPointsPickupSpawnTime = BasePointsPickupSpawnTime;
+	}
 }
 
 bool USpawnManagerComponent::TrySpawnActor(UClass* ActorClass, AActor*& OutSpawnedActor)
