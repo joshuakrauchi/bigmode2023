@@ -5,6 +5,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 
 AGameplayGS::AGameplayGS()
 {
@@ -56,6 +57,19 @@ void AGameplayGS::AddScore(int ScoreAmount)
 	if (ScoreAmount <= 0) { return; }
 
 	CurrentScore += (ScoreAmount * (1.0f + (ScoreMultiplierIncreasePerComboKill * CurrentComboCount)));
+
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	LevelDirectionalLight = Cast<ADirectionalLight>(UGameplayStatics::GetActorOfClass(World, ADirectionalLight::StaticClass()));
+	if (!IsValid(LevelDirectionalLight)) { return; }
+
+	float NormalisedScore = FMath::Clamp((float) CurrentScore / DarkestScoreAmount, 0, 1);
+	float SunRotation = FMath::Lerp(StartingSunRotation, FinalSunRotation, NormalisedScore);
+
+	FRotator LightRotation { SunRotation, 0.f, 0.f };
+
+	LevelDirectionalLight->SetActorRelativeRotation(LightRotation);
 }
 
 void AGameplayGS::RegisterCharacter(ABaseCharacter* Character)

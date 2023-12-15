@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
+#include "Engine/DirectionalLight.h"
 #include "GameplayGS.generated.h"
 
 class USpawnManagerComponent;
@@ -40,12 +41,24 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		int CurrentComboCount = 0;
 
+	UPROPERTY(EditAnywhere)
+		int DarkestScoreAmount = 0;
+
+	UPROPERTY(EditAnywhere)
+		float StartingSunRotation = 0.f;
+
+	UPROPERTY(EditAnywhere)
+		float FinalSunRotation = 0.f;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<USpawnManagerComponent> SpawnManagerComponent = nullptr;
 
 	UPROPERTY()
 		TSet<TObjectPtr<ABaseCharacter>> AllCharacters;
+
+	UPROPERTY()
+		TObjectPtr<ADirectionalLight> LevelDirectionalLight = nullptr;
 
 public:
 	AGameplayGS();
