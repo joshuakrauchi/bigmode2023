@@ -11,6 +11,7 @@
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "GameInstance/MainGameInstance.h"
+#include "AIController.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -343,6 +344,15 @@ void ABaseCharacter::UpdateMoveToSafeSpawner(float DeltaSeconds)
 			bIsMovingToSafeSpawner = false;
 		}
 	}
+}
+
+void ABaseCharacter::DestroyAIController()
+{
+	TObjectPtr<AAIController> AIC = GetController<AAIController>();
+	if (!IsValid(AIC)) { return; }
+
+	AIC->UnPossess();
+	AIC->Destroy();
 }
 
 void ABaseCharacter::SpawnFireable()

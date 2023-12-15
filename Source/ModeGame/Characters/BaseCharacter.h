@@ -197,6 +197,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void CreateDamageIndicator(FVector DamageStartLocation, FLinearColor DamageColor);
 
+	UFUNCTION(BlueprintCallable)
+		void DestroyAIController();
+
 private:
 	UFUNCTION()
 		void SpawnFireable();
