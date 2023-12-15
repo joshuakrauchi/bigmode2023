@@ -72,6 +72,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void AddScore(int ScoreAmount);
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void OnComboIncreased();
+
 	UFUNCTION()
 		void RegisterCharacter(ABaseCharacter* Character);
 
