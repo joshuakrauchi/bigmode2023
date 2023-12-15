@@ -55,6 +55,18 @@ public:
 		float ScoreTextRiseSpeed = 0.0f;
 
 	UPROPERTY(EditAnywhere)
+		float ScoreTextBaseSizeAmount = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float ScoreTextBaseSize = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float ScoreTextMaxSize = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float ScoreTextMinSize = 0.0f;
+
+	UPROPERTY(EditAnywhere)
 		float BaseTimeBeforeScoreTextDisappear = 0.0f;
 
 	UPROPERTY(EditAnywhere)
@@ -96,6 +108,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 		float SafeSpawnerMoveSpeed = 0.0f;
+
+	UPROPERTY()
+		float TotalDamagedSinceLastFrame;
 
 public:
 	// Sets default values for this character's properties
