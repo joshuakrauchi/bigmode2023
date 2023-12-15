@@ -93,6 +93,8 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 	UpdateInvincibility(DeltaSeconds);
 	UpdateScoreText(DeltaSeconds);
 	UpdateMoveToSafeSpawner(DeltaSeconds);
+
+	TotalDamagedSinceLastFrame = 0.0f;
 }
 
 void ABaseCharacter::PossessedBy(AController* NewController)
@@ -123,7 +125,8 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, FVector Damage
 		int ScoreText = FMath::RoundFromZero(TotalDamage);
 		if (ScoreText <= 0.0f) { return; }
 
-		SetScoreText(ScoreText, SourceColour);
+		TotalDamagedSinceLastFrame += ScoreText;
+		SetScoreText(TotalDamagedSinceLastFrame, SourceColour);
 		
 		GameplayGS->AddScore(ScoreText);
 
@@ -494,5 +497,6 @@ void ABaseCharacter::SetScoreText(int Number, EPlayableColours Colour)
 	ScoreTextRenderComponent->SetTextRenderColor(RenderColor.ToFColor(true));
 	ScoreTextRenderComponent->SetText(FText::FromString(FString::Printf(TEXT("%d"), Number)));
 	ScoreTextRenderComponent->SetVisibility(true);
+	ScoreTextRenderComponent->SetWorldSize(FMath::Clamp(ScoreTextBaseSize * Number / ScoreTextBaseSizeAmount, ScoreTextMinSize, ScoreTextMaxSize));
 	CurrentTimeBeforeScoreTextDisappear = BaseTimeBeforeScoreTextDisappear;
 }
