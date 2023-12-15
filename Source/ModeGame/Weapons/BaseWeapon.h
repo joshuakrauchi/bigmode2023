@@ -92,6 +92,9 @@ public:
 	// end IFireable
 
 	UFUNCTION(BlueprintCallable)
+		void EndFireOnHealthDepleted();
+
+	UFUNCTION(BlueprintCallable)
 		virtual float GetFalloffAdjustedDamage(float Distance) const;
 
 	virtual UAnimSequence* GetArmedAnimSequence_Implementation() const override;

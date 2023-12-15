@@ -70,6 +70,11 @@ bool ABaseWeapon::TryEquipToParentTransform(const FTransform& Transform, USkelet
 	return true;
 }
 
+void ABaseWeapon::EndFireOnHealthDepleted()
+{
+	TryEndFire();
+}
+
 float ABaseWeapon::GetFalloffAdjustedDamage(float Distance) const
 {
 	float AdjustedDistance = FMath::Clamp((Distance - DamageFalloffRange) / (DamageFalloffEndRange - DamageFalloffRange), 0, 1);
