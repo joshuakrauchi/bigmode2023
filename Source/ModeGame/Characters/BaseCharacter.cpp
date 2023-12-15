@@ -460,7 +460,7 @@ float ABaseCharacter::GetIncomingDamageMultiplierForColour(EPlayableColours Inco
 
 	if (GameInstance->IsHardMode())
 	{
-		HardStrongAgainstColourDamageMultiplier;
+		return HardStrongAgainstColourDamageMultiplier;
 	}
 	return StrongAgainstColourDamageMultiplier;
 }
