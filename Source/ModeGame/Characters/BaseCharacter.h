@@ -43,6 +43,12 @@ public:
 		float WeakAgainstColourDamageMultiplier = 0.0f;
 
 	UPROPERTY(EditAnywhere)
+		float HardStrongAgainstColourDamageMultiplier = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+		float HardWeakAgainstColourDamageMultiplier = 0.0f;
+
+	UPROPERTY(EditAnywhere)
 		float BaseInvincibilityTime = 0.0f;
 
 	UPROPERTY(VisibleAnywhere)

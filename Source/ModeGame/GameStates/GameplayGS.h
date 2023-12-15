@@ -20,8 +20,11 @@ class MODEGAME_API AGameplayGS : public AGameStateBase
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere)
 		float BaseHealth = 0;
+
+	UPROPERTY(EditAnywhere)
+		float HardBaseHealth = 0;
 
 	UPROPERTY(BlueprintReadOnly)
 		float CurrentHealth = 0;
@@ -108,6 +111,9 @@ public:
 
 	UFUNCTION()
 		void ClearComboCount();
+
+	UFUNCTION(BlueprintCallable)
+		float GetBaseHealth() const;
 
 private:
 	UFUNCTION()

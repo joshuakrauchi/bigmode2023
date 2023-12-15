@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameInstance/MainGameInstance.h"
 
 AGameplayGS::AGameplayGS()
 {
@@ -98,6 +99,17 @@ void AGameplayGS::IncrementComboCount()
 void AGameplayGS::ClearComboCount()
 {
 	CurrentComboCount = 0;
+}
+
+float AGameplayGS::GetBaseHealth() const
+{
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return 0.0f; }
+
+	TObjectPtr<UMainGameInstance> GameInstance = World->GetGameInstance<UMainGameInstance>();
+	if (!IsValid(GameInstance)) { return 0.0f; }
+
+	return (GameInstance->IsHardMode() ? HardBaseHealth : BaseHealth);
 }
 
 void AGameplayGS::UpdateComboEndTime(float DeltaSeconds)

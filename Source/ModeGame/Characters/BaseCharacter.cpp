@@ -10,6 +10,7 @@
 #include "Characters/ExplodingDeathCharacter.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Components/CapsuleComponent.h"
+#include "GameInstance/MainGameInstance.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -137,7 +138,7 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, FVector Damage
 
 	if (IsPlayerControlled())
 	{
-		GameplayGS->DecreaseHealth(DamageAmount);
+		GameplayGS->DecreaseHealth(TotalDamage);
 
 		PlayDamagedPlayerSFX();
 
@@ -147,7 +148,7 @@ void ABaseCharacter::OnDamaged_Implementation(float DamageAmount, FVector Damage
 	{
 		bool bWasExhausted = IsExhausted();
 
-		CurrentHealth -= DamageAmount;
+		CurrentHealth -= TotalDamage;
 
 		if (IsExhausted() && !bWasExhausted && FMath::RandBool())
 		{
@@ -392,10 +393,19 @@ void ABaseCharacter::OnHealthDepleted()
 
 float ABaseCharacter::GetIncomingDamageMultiplierForColour(EPlayableColours IncomingDamageColour)
 {
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return 0.0f; }
+	
+	TObjectPtr<UMainGameInstance> GameInstance = World->GetGameInstance<UMainGameInstance>();
+	if (!IsValid(GameInstance)) { return 0.0f; }
+
 	if (CharacterColour == IncomingDamageColour)
 	{
-		return SameColourDamageMultiplier;
+		float Multiplier = SameColourDamageMultiplier;
+		return Multiplier;
 	}
+
+	bool bIsWeak = false;
 
 	switch (CharacterColour)
 	{
@@ -403,11 +413,7 @@ float ABaseCharacter::GetIncomingDamageMultiplierForColour(EPlayableColours Inco
 	{
 		if (IncomingDamageColour == EPlayableColours::Blue)
 		{
-			return WeakAgainstColourDamageMultiplier;
-		}
-		else if (IncomingDamageColour == EPlayableColours::Green)
-		{
-			return StrongAgainstColourDamageMultiplier;
+			bIsWeak = true;
 		}
 	}
 	break;
@@ -415,22 +421,14 @@ float ABaseCharacter::GetIncomingDamageMultiplierForColour(EPlayableColours Inco
 	{
 		if (IncomingDamageColour == EPlayableColours::Red)
 		{
-			return WeakAgainstColourDamageMultiplier;
-		}
-		else if (IncomingDamageColour == EPlayableColours::Blue)
-		{
-			return StrongAgainstColourDamageMultiplier;
+			bIsWeak = true;
 		}
 	}
 	break;
 	case EPlayableColours::Blue:
 		if (IncomingDamageColour == EPlayableColours::Green)
 		{
-			return WeakAgainstColourDamageMultiplier;
-		}
-		else if (IncomingDamageColour == EPlayableColours::Red)
-		{
-			return StrongAgainstColourDamageMultiplier;
+			bIsWeak = true;
 		}
 		break;
 	case EPlayableColours::Grey:
@@ -440,7 +438,21 @@ float ABaseCharacter::GetIncomingDamageMultiplierForColour(EPlayableColours Inco
 		break;
 	}
 
-	return 1.0f;
+	if (bIsWeak)
+	{
+		if (GameInstance->IsHardMode())
+		{
+			return HardWeakAgainstColourDamageMultiplier;
+		}
+		
+		return WeakAgainstColourDamageMultiplier;
+	}
+
+	if (GameInstance->IsHardMode())
+	{
+		HardStrongAgainstColourDamageMultiplier;
+	}
+	return StrongAgainstColourDamageMultiplier;
 }
 
 void ABaseCharacter::UpdateInvincibility(float DeltaSeconds)
