@@ -19,6 +19,11 @@ void AGameplayGS::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentHealth = BaseHealth;
+
+	TObjectPtr<UWorld> World = GetWorld();
+	if (!IsValid(World)) { return; }
+
+	LevelDirectionalLight = Cast<ADirectionalLight>(UGameplayStatics::GetActorOfClass(World, ADirectionalLight::StaticClass()));
 }
 
 void AGameplayGS::Tick(float DeltaSeconds)
@@ -58,16 +63,12 @@ void AGameplayGS::AddScore(int ScoreAmount)
 
 	CurrentScore += (ScoreAmount * (1.0f + (ScoreMultiplierIncreasePerComboKill * CurrentComboCount)));
 
-	TObjectPtr<UWorld> World = GetWorld();
-	if (!IsValid(World)) { return; }
-
-	LevelDirectionalLight = Cast<ADirectionalLight>(UGameplayStatics::GetActorOfClass(World, ADirectionalLight::StaticClass()));
 	if (!IsValid(LevelDirectionalLight)) { return; }
 
-	float NormalisedScore = FMath::Clamp((float) CurrentScore / DarkestScoreAmount, 0, 1);
-	float SunRotation = FMath::Lerp(StartingSunRotation, FinalSunRotation, NormalisedScore);
+	float NormalisedScore = FMath::Clamp((float) CurrentScore / DuskScoreAmount, 0, 1);
+	float SunRotation = FMath::Lerp(StartingSunRotation, DuskSunRotation, NormalisedScore);
 
-	FRotator LightRotation { SunRotation, 0.f, 0.f };
+	FRotator LightRotation{ CurrentScore < NightScoreAmount ? SunRotation : NightSunRotation, 0.f, 0.f };
 
 	LevelDirectionalLight->SetActorRelativeRotation(LightRotation);
 }

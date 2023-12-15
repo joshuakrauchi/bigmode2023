@@ -42,13 +42,19 @@ public:
 		int CurrentComboCount = 0;
 
 	UPROPERTY(EditAnywhere)
-		int DarkestScoreAmount = 0;
+		int DuskScoreAmount = 0;
+
+	UPROPERTY(EditAnywhere)
+		int NightScoreAmount = 0;
 
 	UPROPERTY(EditAnywhere)
 		float StartingSunRotation = 0.f;
 
 	UPROPERTY(EditAnywhere)
-		float FinalSunRotation = 0.f;
+		float NightSunRotation = 0.f;
+
+	UPROPERTY(EditAnywhere)
+		float DuskSunRotation = 0.f;
 
 private:
 	UPROPERTY(VisibleAnywhere)
