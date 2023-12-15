@@ -228,7 +228,7 @@ void ABaseCharacter::DoubleJump()
 
 bool ABaseCharacter::IsExhausted() const
 {
-	return (!IsPlayerControlled() && (CurrentHealth <= (BaseHealth * ExhaustedHealthMultiplierThreshold)));
+	return (!IsPlayerControlled() && (CurrentHealth <= 0.0f));
 }
 
 bool ABaseCharacter::CanBePossessed() const

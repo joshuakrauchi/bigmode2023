@@ -34,9 +34,6 @@ public:
 		EPlayableColours CharacterColour = EPlayableColours::None;
 
 	UPROPERTY(EditAnywhere)
-		float ExhaustedHealthMultiplierThreshold = 0.0f;
-
-	UPROPERTY(EditAnywhere)
 		float SameColourDamageMultiplier = 0.0f;
 
 	UPROPERTY(EditAnywhere)
