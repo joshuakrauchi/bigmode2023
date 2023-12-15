@@ -76,7 +76,7 @@ int AGameplayGS::GetNumCharacters() const
 void AGameplayGS::IncrementComboCount()
 {
 	++CurrentComboCount;
-
+	OnComboIncreased();
 	CurrentTimeUntilComboEnd = BaseTimeUntilComboEnd;
 }
 
